@@ -478,8 +478,5 @@ async function downloadProgramAsPdf(programIndex, downloadButton) {
     }
 }
 
-// REMOVED: Problematic addPreferredSectionInput functions that caused stack overflow
-// These functions are now handled centrally in index.js
-
 // Export for global access
 window.generateSchedule = generateSchedule;
