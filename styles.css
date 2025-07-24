@@ -599,18 +599,6 @@ input#joint-pdf-file {
     width: auto; /* Allow width to grow based on content */
 }
 
-input#pdf-file::before,
-input#joint-pdf-file::before {
-    content: ''; /* Remove 'Choose file' placeholder text, as "Choose File" button and "No file chosen" text are sufficient */
-    position: absolute;
-    left: 1rem;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--text-secondary);
-    font-size: 1rem; /* Ensure pseudo-element text is visible */
-    pointer-events: none; /* Not clickable */
-}
-
 /* Rule block starting at line 586 – düzeltilmiş yorum satırı ile */
 input#pdf-file::-webkit-file-upload-button,
 input#joint-pdf-file::-webkit-file-upload-button {
