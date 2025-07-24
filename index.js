@@ -1,10 +1,8 @@
-// index.js
-// Ortak değişkenler ve yardımcı fonksiyonlar buraya taşındı
 let pdfData = [];
 let jointPdfData = [];
 
-// PDF.js kütüphanesini yükle
 document.addEventListener('DOMContentLoaded', function() {
+    // PDF.js setup
     const script = document.createElement('script');
     script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
     document.head.appendChild(script);
@@ -12,25 +10,16 @@ document.addEventListener('DOMContentLoaded', function() {
     script.onload = function() {
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-        // PDF dosya inputlarına event listener ekle
-        const pdfFileInput = document.getElementById('pdf-file');
-        const jointPdfFileInput = document.getElementById('joint-pdf-file');
+        document.getElementById('pdf-file')?.addEventListener('change', function() {
+            handlePdfFile('pdf-file', 'pdf-status', 'pdf');
+        });
 
-        if (pdfFileInput) {
-            pdfFileInput.addEventListener('change', function() {
-                handlePdfFile('pdf-file', 'pdf-status', 'pdf');
-            });
-        }
-
-        if (jointPdfFileInput) {
-            jointPdfFileInput.addEventListener('change', function() {
-                handlePdfFile('joint-pdf-file', 'joint-pdf-status', 'joint');
-            });
-        }
+        document.getElementById('joint-pdf-file')?.addEventListener('change', function() {
+            handlePdfFile('joint-pdf-file', 'joint-pdf-status', 'joint');
+        });
     };
 });
 
-// PDF'ten metin çıkarma fonksiyonu
 async function extractTextFromPDF(file) {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -46,19 +35,16 @@ async function extractTextFromPDF(file) {
                     let lastY = -1;
                     let lineBuffer = [];
                     for (const item of textContent.items) {
-                        // Yeni satır tespiti, y konumuna göre
                         if (lastY === -1 || Math.abs(item.transform[5] - lastY) > 10) {
                             if (lineBuffer.length > 0) {
                                 fullText += lineBuffer.join(' ').trim() + '\n';
                             }
                             lineBuffer = [item.str];
                         } else {
-                            // Aynı satırda ise boşluk ekle
                             lineBuffer.push(item.str);
                         }
                         lastY = item.transform[5];
                     }
-                    // Son satırı da ekle
                     if (lineBuffer.length > 0) {
                         fullText += lineBuffer.join(' ').trim() + '\n';
                     }
@@ -73,12 +59,9 @@ async function extractTextFromPDF(file) {
     });
 }
 
-// PDF metnini ayrıştırma fonksiyonu
 function parsePdfText(text) {
     const lines = text.split('\n').filter(line => line.trim());
     const data = [];
-    console.log("PDF'ten çıkarılan satırlar (parsePdfText içinde):", lines);
-
     const dayKeywords = ['PAZARTESİ', 'SALI', 'ÇARŞAMBA', 'PERŞEMBE', 'CUMA', 'CUMARTESİ', 'PAZAR'];
     const timeRegex = /\b(\d{2}:\d{2})\b/g;
     const courseCodeRegex = /\b([A-Z]{2,6}\s?\d{3,4})\b/i;
@@ -86,9 +69,6 @@ function parsePdfText(text) {
 
     for (let i = 0; i < lines.length; i++) {
         const line = lines[i];
-        const originalLine = line;
-        console.log(`İşlenen satır: "${originalLine}"`);
-
         let foundCourseCode = '';
         let foundSection = '';
         let foundDay = '';
@@ -150,30 +130,13 @@ function parsePdfText(text) {
 
         if (foundCourseCode && foundSection && foundDay && foundStartTime && foundEndTime) {
             data.push([
-                '', // SIRA NO
-                foundSection, // Şube
-                foundCourseCode, // Ders Kodu
-                foundDay, // Gün
-                foundStartTime, // Başlangıç Saati
-                foundEndTime, // Bitiş Saati
-                '' // Derslik
+                '', foundSection, foundCourseCode, foundDay, foundStartTime, foundEndTime, ''
             ]);
-            console.log(`Başarıyla ayrıştırıldı: Ders: ${foundCourseCode}, Şube: ${foundSection}, Gün: ${foundDay}, Saat: ${foundStartTime}-${foundEndTime}`);
-        } else {
-            console.warn(`Ayrıştırma başarısız oldu (eksik bilgi): Satır: "${originalLine}"`, {
-                code: foundCourseCode,
-                section: foundSection,
-                day: foundDay,
-                start: foundStartTime,
-                end: foundEndTime
-            });
         }
     }
-    console.log(`parsePdfText fonksiyonu tamamlandı. Toplam ${data.length} satır ayrıştırıldı.`);
     return data;
 }
 
-// PDF dosyasını işleme fonksiyonu
 async function handlePdfFile(fileInputId, statusId, dataVariable) {
     const fileInput = document.getElementById(fileInputId);
     const statusDiv = document.getElementById(statusId);
@@ -210,43 +173,43 @@ async function handlePdfFile(fileInputId, statusId, dataVariable) {
     }
 }
 
-// Sekme değiştirme fonksiyonu
 function switchTab(tabName) {
     document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
     document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
 
-    event.target.classList.add('active');
+    event.target.closest('.tab').classList.add('active');
     document.getElementById(tabName + '-tab').classList.add('active');
 
-    // Tüm çıktıları, durum mesajlarını ve dosya inputlarını temizle
     document.getElementById('results').innerHTML = '';
     document.getElementById('pdf-status').innerHTML = '';
     document.getElementById('joint-pdf-status').innerHTML = '';
 
-    // PDF inputlarını sıfırla
     const pdfFileInputSingle = document.getElementById('pdf-file');
     const pdfFileInputJoint = document.getElementById('joint-pdf-file');
 
     if (pdfFileInputSingle) {
-        pdfFileInputSingle.value = ''; // Inputu sıfırla
-        pdfData = []; // Saklanan PDF verisini sıfırla
+        pdfFileInputSingle.value = '';
+        pdfData = [];
     }
     if (pdfFileInputJoint) {
-        pdfFileInputJoint.value = ''; // Inputu sıfırla
-        jointPdfData = []; // Saklanan ortak PDF verisini sıfırla
+        pdfFileInputJoint.value = '';
+        jointPdfData = [];
     }
 }
 
-// Yardımcı UI fonksiyonları
 function addCourse() {
     const courseInputs = document.getElementById('course-inputs');
     const newInput = document.createElement('div');
     newInput.className = 'course-input';
     newInput.innerHTML = `
-        <input type="text" placeholder="Ders kodu (örn: SE 1108)" />
-        <button class="btn btn-danger btn-small" onclick="removeCourse(this)">Sil</button>
+        <input type="text" placeholder="Ders kodu (örn: SE 1108)" autocomplete="off" />
+        <button class="btn btn-danger btn-small" onclick="removeCourse(this)" type="button">Sil</button>
     `;
     courseInputs.appendChild(newInput);
+    
+    const input = newInput.querySelector('input');
+    input.focus();
+    if (navigator.vibrate) navigator.vibrate(10);
 }
 
 function addCoursePerson1() {
@@ -254,10 +217,14 @@ function addCoursePerson1() {
     const newInput = document.createElement('div');
     newInput.className = 'course-input';
     newInput.innerHTML = `
-        <input type="text" placeholder="Ders kodu (örn: SE 1108)" />
-        <button class="btn btn-danger btn-small" onclick="removeCourse(this)">Sil</button>
+        <input type="text" placeholder="Ders kodu (örn: SE 1108)" autocomplete="off" />
+        <button class="btn btn-danger btn-small" onclick="removeCourse(this)" type="button">Sil</button>
     `;
     courseInputs.appendChild(newInput);
+    
+    const input = newInput.querySelector('input');
+    input.focus();
+    if (navigator.vibrate) navigator.vibrate(10);
 }
 
 function addCoursePerson2() {
@@ -265,17 +232,21 @@ function addCoursePerson2() {
     const newInput = document.createElement('div');
     newInput.className = 'course-input';
     newInput.innerHTML = `
-        <input type="text" placeholder="Ders kodu (örn: MATH 1132)" />
-        <button class="btn btn-danger btn-small" onclick="removeCourse(this)">Sil</button>
+        <input type="text" placeholder="Ders kodu (örn: MATH 1132)" autocomplete="off" />
+        <button class="btn btn-danger btn-small" onclick="removeCourse(this)" type="button">Sil</button>
     `;
     courseInputs.appendChild(newInput);
+    
+    const input = newInput.querySelector('input');
+    input.focus();
+    if (navigator.vibrate) navigator.vibrate(10);
 }
 
 function removeCourse(button) {
     button.parentElement.remove();
+    if (navigator.vibrate) navigator.vibrate(15);
 }
 
-// Sonuçları ekrana basan fonksiyon (her iki program tipi de kullanabilir)
 function displayResults(schedules, startTime, endTime, isJoint = false) {
     const resultsDiv = document.getElementById('results');
 
@@ -295,7 +266,7 @@ function displayResults(schedules, startTime, endTime, isJoint = false) {
     `;
 
     schedules.forEach((schedule, index) => {
-        const freeDays = getFreeDays(isJoint ? schedule.person1Schedule : schedule); // Ortak programda ayrı bir yapıya sahip olabilir
+        const freeDays = getFreeDays(isJoint ? schedule.person1Schedule : schedule);
         const commonFreeDays = isJoint ? calculateCommonFreeDays(schedule.person1Schedule, schedule.person2Schedule) : null;
         const commonFreeHours = isJoint ? calculateCommonFreeHours(schedule.person1Schedule, schedule.person2Schedule) : null;
 
@@ -344,7 +315,7 @@ function displayResults(schedules, startTime, endTime, isJoint = false) {
                 `;
             }
 
-        } else { // Tekil Program
+        } else {
             for (const [courseName, option] of Object.entries(schedule)) {
                 html += `
                     <div class="course-item">
@@ -374,7 +345,6 @@ function displayResults(schedules, startTime, endTime, isJoint = false) {
     resultsDiv.innerHTML = html;
 }
 
-// Ders, Şube ve Zaman Dilimi Sınıfları (Global olarak kalsın ki tüm scriptler erişebilsin)
 class TimeSlot {
     constructor(day, startTime, endTime) {
         this.day = day;
@@ -416,7 +386,6 @@ class Course {
     }
 }
 
-// Zaman aralığı kontrolü (her iki program tipi de kullanabilir)
 function timeInRange(start, end, check) {
     const startTime = new Date(`1970-01-01T${start}:00`);
     const endTime = new Date(`1970-01-01T${end}:00`);
@@ -425,9 +394,8 @@ function timeInRange(start, end, check) {
 }
 
 function isScheduleWithinTimeRange(schedule, startTime, endTime) {
-    // isJoint parametresi kontrolü eklendi, ancak varsayılan olarak tekil program bekler
     let schedulesToCheck = [schedule];
-    if (schedule.person1Schedule && schedule.person2Schedule) { // Ortak program yapısı ise
+    if (schedule.person1Schedule && schedule.person2Schedule) {
         schedulesToCheck = [schedule.person1Schedule, schedule.person2Schedule];
     }
 
@@ -444,7 +412,6 @@ function isScheduleWithinTimeRange(schedule, startTime, endTime) {
     return true;
 }
 
-// Boş günleri hesaplama (her iki program tipi de kullanabilir)
 function getFreeDays(schedule) {
     const allDays = new Set(['PAZARTESİ', 'SALI', 'ÇARŞAMBA', 'PERŞEMBE', 'CUMA']);
     const busyDays = new Set();
