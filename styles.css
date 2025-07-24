@@ -1021,3 +1021,87 @@ input[type="file"]:hover {
         color: #000;
     }
 }
+
+/* Styling for the text next to the file input button */
+.file-upload-text {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    white-space: nowrap; /* Prevent text from wrapping */
+    flex-grow: 1; /* Allow text to take available space */
+    text-align: left;
+    overflow: hidden; /* Hide overflowing text */
+    text-overflow: ellipsis; /* Add ellipsis for overflowing text */
+    margin-right: 1rem; /* Space between text and file status */
+    line-height: normal; /* Ensure consistent line height */
+}
+
+/* Adjusted flex order for better layout */
+.form-group:has(input#pdf-file) label,
+.form-group:has(input#joint-pdf-file) label {
+    order: 0; /* Keep label at the top */
+    width: 100%; /* Make label take full width */
+    margin-bottom: 0.5rem;
+}
+
+.form-group:has(input#pdf-file) input[type="file"],
+.form-group:has(input#joint-pdf-file) input[type="file"] {
+    position: relative;
+    order: 1; /* Button first */
+    flex-grow: 0; /* Do not allow input to grow (the file text is handled by the span) */
+    width: auto; /* Allow the input field itself to be minimal */
+    padding: 0; /* Remove padding from the input field itself */
+    border: none; /* Remove border from the input field itself */
+    background: transparent; /* Make background transparent */
+    height: auto; /* Allow height to adjust */
+    min-height: auto;
+}
+
+.form-group:has(input#pdf-file) .file-status,
+.form-group:has(input#joint-pdf-file) .file-status {
+    order: 3; /* Status last */
+    width: 100%; /* Take full width */
+    margin-top: 0.5rem; /* Add some space from the input/button */
+}
+
+/* Ensure the native file input button is the only visible part of the input[type="file"] */
+input#pdf-file::-webkit-file-upload-button,
+input#joint-pdf-file::-webkit-file-upload-button {
+    /* Keep existing styles */
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color: white;
+    border: none;
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 0.875rem;
+    line-height: normal;
+    transition: all 0.3s ease;
+    font-family: inherit;
+    order: 1; /* This is inside the shadow DOM, affects position within the native button */
+    align-self: center;
+    display: block;
+    width: auto;
+    min-width: 120px;
+    margin: 0;
+    position: relative;
+    z-index: 2;
+}
+
+/* Creating the custom text "PDF dosyasını seçin" */
+.form-group:has(input#pdf-file)::before,
+.form-group:has(input#joint-pdf-file)::before {
+    content: "PDF dosyasını seçin"; /* The desired text */
+    display: block;
+    padding: 0.75rem 0; /* Adjust padding to match button height */
+    color: var(--text-secondary); /* Text color */
+    font-size: 0.875rem; /* Font size */
+    flex-grow: 1;
+    order: 2; /* Position after the button */
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: normal; /* Match button's line height */
+    align-self: center;
+}
