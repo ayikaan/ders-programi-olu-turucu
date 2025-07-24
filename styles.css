@@ -542,12 +542,14 @@ textarea:hover {
 }
 
 .file-status {
-    margin-top: 1rem;
-    padding: 1rem;
+    margin-top: 0.5rem; /* Butonla arasındaki boşluğu ayarla */
+    padding: 0.75rem 1rem; /* Daha kompakt */
     border-radius: var(--radius-md);
     font-size: 0.875rem;
     font-weight: 500;
     word-break: break-word;
+    text-align: center; /* Metni ortala */
+    order: 2; /* Butondan sonra gelmesini sağla */
 }
 
 .file-status.success {
@@ -568,15 +570,22 @@ textarea:hover {
     border-left: 4px solid var(--text-muted);
 }
 
+/* Dosya yükleme alanı ve butonu için güncellemeler */
+/* input[type="file"] elementini esnek bir kutu yapıyoruz */
 input[type="file"] {
-    background: var(--bg-input);
     cursor: pointer;
     border: 2px dashed var(--border);
-    padding: 1.5rem 1rem;
-    text-align: center;
+    background: var(--bg-input);
     transition: all 0.3s ease;
     position: relative;
-    min-height: 60px;
+    min-height: 100px; /* Buton ve metin için yeterli yükseklik */
+    
+    /* Flexbox özellikleri */
+    display: flex;
+    flex-direction: column; /* İçeriği dikey sırala */
+    justify-content: center; /* İçeriği dikeyde ortala */
+    align-items: center; /* İçeriği yatayda ortala */
+    padding: 0; /* Kendi iç padding'i sıfırlıyoruz */
 }
 
 input[type="file"]:hover {
@@ -584,6 +593,7 @@ input[type="file"]:hover {
     background: var(--bg-secondary);
 }
 
+/* Butonun kendisi (Webkit tabanlı tarayıcılar için) */
 input[type="file"]::-webkit-file-upload-button {
     background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
     color: white;
@@ -592,15 +602,16 @@ input[type="file"]::-webkit-file-upload-button {
     border-radius: var(--radius-md);
     cursor: pointer;
     font-weight: 500;
-    margin-right: 0.5rem;
-    margin-bottom: 0.5rem;
     font-size: 0.875rem;
     transition: all 0.3s ease;
     font-family: inherit;
-    display: block;
-    width: 100%;
-    max-width: 200px;
-    margin: 0 auto 0.5rem auto;
+    
+    display: block; /* Butonun blok eleman olmasını sağlayın */
+    width: auto; /* İçeriğine göre genişlesin */
+    min-width: 120px; /* Minimum genişlik vererek butonu görünür tutun */
+    margin: 0; /* Otomatik margin'leri kaldırın, flexbox yönetecek */
+    order: 1; /* Butonun önce gelmesini sağlar */
+    align-self: center; /* Kendini yatayda ortala */
 }
 
 input[type="file"]::-webkit-file-upload-button:hover {
@@ -765,7 +776,7 @@ input[type="file"]::-webkit-file-upload-button:hover {
     }
 }
 
-/* Loading Overlay Styles */
+/* Loading Overlay Styles (mobile-utils.js'den taşındı) */
 .loading-overlay {
     position: fixed;
     top: 0;
