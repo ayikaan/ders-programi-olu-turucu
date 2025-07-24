@@ -572,20 +572,71 @@ textarea:hover {
 
 /* Dosya yükleme alanı ve butonu için güncellemeler */
 /* input[type="file"] elementini esnek bir kutu yapıyoruz */
-input[type="file"] {
-    cursor: pointer;
+.form-group:has(input#pdf-file),
+.form-group:has(input#joint-pdf-file) {
+    display: flex; /* Flexbox yapısını etkinleştir */
+    align-items: center; /* Dikeyde ortala */
+    gap: 1rem; /* Buton ve metin arasında boşluk */
+}
+
+input#pdf-file,
+input#joint-pdf-file {
+    flex-grow: 1; /* Input alanının genişlemesine izin ver */
+    padding: 1rem;
     border: 2px dashed var(--border);
+    border-radius: var(--radius-md);
     background: var(--bg-input);
+    color: transparent; /* Metni gizle, sadece buton görünecek */
+    overflow: hidden; /* Taşan içeriği gizle */
+    position: relative; /* İçindeki butonu konumlandırmak için */
+    min-height: auto; /* Yüksekliği içeriğe göre ayarla */
+    text-align: left; /* Metni sola hizala (görünmese de) */
+}
+
+input#pdf-file::before,
+input#joint-pdf-file::before {
+    content: 'Dosya seçin'; /* Placeholder gibi metin ekle */
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-secondary);
+    font-size: 1rem;
+    pointer-events: none; /* Üzerine tıklanabilir olmasın */
+}
+
+input#pdf-file::-webkit-file-upload-button,
+input#joint-pdf-file::-webkit-file-upload-button {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color: white;
+    border: none;
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 0.875rem;
     transition: all 0.3s ease;
-    position: relative;
-    min-height: 100px; /* Buton ve metin için yeterli yükseklik */
-    
-    /* Flexbox özellikleri */
-    display: flex;
-    flex-direction: column; /* İçeriği dikey sırala */
-    justify-content: center; /* İçeriği dikeyde ortala */
-    align-items: center; /* İçeriği yatayda ortala */
-    padding: 0; /* Kendi iç padding'i sıfırlıyoruz */
+    font-family: inherit;
+    margin-right: 1rem; /* Buton ile 'Dosya seçilmedi' arasında boşluk */
+    order: 1; /* Butonu sola al */
+}
+
+input#pdf-file::-webkit-file-upload-button:hover,
+input#joint-pdf-file::-webkit-file-upload-button:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+.file-status {
+    margin-top: 0; /* Üst boşluğu kaldır */
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+    font-weight: 500;
+    word-break: break-word;
+    text-align: left; /* Metni sola hizala */
+    order: 2; /* Metni sağa al */
+    flex-shrink: 0; /* Metnin sıkışmasını engelle */
 }
 
 input[type="file"]:hover {
