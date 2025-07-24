@@ -1,3 +1,5 @@
+// index.js dosyasının TAMAMI (yalnızca değişen kısım değil, tamamen güncellenmiş hali)
+
 let pdfData = [];
 let jointPdfData = [];
 
@@ -77,11 +79,14 @@ function setupCourseContainer(courseContainer, preferredSectionsId) {
         subtree: false
     });
 
-    // Initial setup
+    // Initial setup for existing inputs when the container is set up
+    // This part should ensure existing inputs trigger preferred section setup ONCE.
+    // The debounce function in handleUpdate helps prevent rapid re-triggers.
     setTimeout(() => {
         updatePreferredSections(courseContainer, preferredSectionsContainer);
     }, 50);
-}
+} // Bu parantez, setupCourseContainer fonksiyonunun doğru kapanışıdır.
+  // Altındaki hatalı bloğu kaldırdık.
 
 function updatePreferredSections(courseContainer, preferredSectionsContainer) {
     if (!preferredSectionsContainer) return;
@@ -91,29 +96,39 @@ function updatePreferredSections(courseContainer, preferredSectionsContainer) {
         .map(input => input.value.trim())
         .filter(code => code);
 
+    // Get current preferred section inputs to preserve their values
+    const currentPreferredSections = {};
+    preferredSectionsContainer.querySelectorAll('.preferred-section-input').forEach(div => {
+        const courseCodeDisplay = div.querySelector('.course-code-display').textContent;
+        const sectionInput = div.querySelector('.section-selection');
+        if (courseCodeDisplay) {
+            currentPreferredSections[courseCodeDisplay] = sectionInput ? sectionInput.value : '';
+        }
+    });
+
     // Clear existing preferred sections
     preferredSectionsContainer.innerHTML = '';
 
-    // Add preferred section input for each course code
+    // Add preferred section input for each course code, restoring value if it existed
     courseCodes.forEach(courseCode => {
         if (courseCode) {
-            addPreferredSectionInput(courseCode, preferredSectionsContainer);
+            addPreferredSectionInput(courseCode, preferredSectionsContainer, currentPreferredSections[courseCode] || '');
         }
     });
 }
 
-function addPreferredSectionInput(courseCode, container) {
+function addPreferredSectionInput(courseCode, container, initialValue = '') {
     const preferredSectionDiv = document.createElement('div');
     preferredSectionDiv.className = 'preferred-section-input';
     preferredSectionDiv.innerHTML = `
         <div class="course-code-display">${courseCode}</div>
-        <input type="text" class="section-selection" placeholder="Şubeleri virgülle ayır (örn: 1,3)" autocomplete="off" />
+        <input type="text" class="section-selection" placeholder="Şubeleri virgülle ayır (örn: 1,3)" autocomplete="off" value="${initialValue}" />
     `;
     container.appendChild(preferredSectionDiv);
 }
 
 // Global functions for adding/removing courses
-window.addPreferredSectionInput = addPreferredSectionInput;
+window.addPreferredSectionInput = addPreferredSectionInput; // Bu satırı koruyun.
 
 function debounce(func, wait) {
     let timeout;
@@ -549,17 +564,3 @@ function getFreeDays(schedule) {
 
     return Array.from(allDays).filter(day => !busyDays.has(day)).sort();
 }
-// Initial setup - check existing inputs immediately
-    const existingInputs = courseContainer.querySelectorAll('input[type="text"]');
-    existingInputs.forEach(input => {
-        if (input.value.trim()) {
-            // Add preferred section input for existing course codes
-            const courseCode = input.value.trim();
-            addPreferredSectionInput(courseCode, preferredSectionsContainer);
-        }
-    });
-    
-    // Also run the general update after a delay
-    setTimeout(() => {
-        updatePreferredSections(courseContainer, preferredSectionsContainer);
-    }, 100);
