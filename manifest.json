@@ -1,0 +1,25 @@
+{
+  "name": "Ders Programı Oluşturucu",
+  "short_name": "DersProgramı",
+  "description": "Çakışmasız ders programı oluşturun",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fafbff",
+  "theme_color": "#8b5cf6",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgdmlld0JveD0iMCAwIDE5MiAxOTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiByeD0iMjQiIGZpbGw9IiM4YjVjZjYiLz4KPHN2ZyB4PSI0OCIgeT0iNDgiIHdpZHRoPSI5NiIgaGVpZ2h0PSI5NiIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+CjxwYXRoIGQ9Im00IDZoMTZsLTEgMTBIMUw0IDZ6Ii8+CjxwYXRoIGQ9Im0xNCA2LTEtM2gtMmwtMSAzIi8+CjxwYXRoIGQ9Ik05IDEwdjQiLz4KPHN2ZyB4PSI5MiIgeT0iNjAiIHdpZHRoPSI4IiBoZWlnaHQ9IjgiIGZpbGw9IndoaXRlIj4KPGNpcmNsZSBjeD0iNCIgY3k9IjQiIHI9IjQiLz4KPC9zdmc+CjxzdmcgeD0iOTIiIHk9IjEwNCIgd2lkdGg9IjgiIGhlaWdodD0iOCIgZmlsbD0id2hpdGUiPgo8Y2lyY2xlIGN4PSI0IiBjeT0iNCIgcj0iNCIvPgo8L3N2Zz4KPC9zdmc+Cjwvc3ZnPgo=",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgdmlld0JveD0iMCAwIDUxMiA1MTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIiByeD0iNjQiIGZpbGw9IiM4YjVjZjYiLz4KPHN2ZyB4PSIxMjgiIHk9IjEyOCIgd2lkdGg9IjI1NiIgaGVpZ2h0PSIyNTYiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPgo8cGF0aCBkPSJtNCA2aDE2bC0xIDEwSDFMNCA2eiIvPgo8cGF0aCBkPSJtMTQgNi0xLTNoLTJsLTEgMyIvPgo8cGF0aCBkPSJNOSAxMHY0Ii8+CjxzdmcgeD0iMjQ0IiB5PSIxNjAiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgZmlsbD0id2hpdGUiPgo8Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSIxMiIvPgo8L3N2Zz4KPHN2ZyB4PSIyNDQiIHk9IjI4MCIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiBmaWxsPSJ3aGl0ZSI+CjxjaXJjbGUgY3g9IjEyIiBjeT0iMTIiIHI9IjEyIi8+Cjwvc3ZnPgo8L3N2Zz4KPC9zdmc+",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    }
+  ],
+  "categories": ["education", "productivity", "utilities"],
+  "lang": "tr",
+  "dir": "ltr"
+}
