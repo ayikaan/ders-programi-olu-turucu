@@ -32,7 +32,7 @@
     --radius-xl: 20px;
 }
 
-/* Viewport Meta Tag Desteği */
+/* Viewport Meta Tag Support */
 html {
     -webkit-text-size-adjust: 100%;
     -webkit-tap-highlight-color: transparent;
@@ -542,20 +542,20 @@ textarea:hover {
 }
 
 .file-status {
-    margin-top: 0.5rem; /* Butonla arasındaki boşluğu ayarla */
-    padding: 0.75rem 1rem; /* Daha kompakt */
+    margin-top: 0.5rem; /* Adjust space from button */
+    padding: 0.75rem 1rem; /* More compact */
     border-radius: var(--radius-md);
     font-size: 0.875rem;
     font-weight: 500;
     word-break: break-word;
-    text-align: center; /* Metni ortala */
-    order: 2; /* Butondan sonra gelmesini sağla */
+    text-align: center; /* Center text */
+    order: 2; /* Position after button */
 }
 
 .file-status.success {
     background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
     color: #14532d;
-    border-left: 4px solid var(--success);
+    border-left: 44px solid var(--success);
 }
 
 .file-status.error {
@@ -570,41 +570,45 @@ textarea:hover {
     border-left: 4px solid var(--text-muted);
 }
 
-/* Dosya yükleme alanı ve butonu için güncellemeler */
-/* input[type="file"] elementini esnek bir kutu yapıyoruz */
+/* Updates for file upload area and button */
+/* Make input[type="file"] element a flex container */
 .form-group:has(input#pdf-file),
 .form-group:has(input#joint-pdf-file) {
-    display: flex; /* Flexbox yapısını etkinleştir */
-    align-items: center; /* Dikeyde ortala */
-    gap: 1rem; /* Buton ve metin arasında boşluk */
+    display: flex; /* Enable flexbox */
+    align-items: center; /* Vertically center */
+    gap: 1rem; /* Space between button and text */
+    flex-wrap: wrap; /* Allow elements to wrap on small screens */
 }
 
 input#pdf-file,
 input#joint-pdf-file {
-    flex-grow: 1; /* Input alanının genişlemesine izin ver */
-    padding: 1rem;
+    /* flex-grow: 1; /* Allow input to grow - REMOVE OR COMMENT THIS LINE */ */
+    padding: 1rem; /* Corrected: changed '}' to ';' */
     border: 2px dashed var(--border);
     border-radius: var(--radius-md);
     background: var(--bg-input);
-    color: transparent; /* Metni gizle, sadece buton görünecek */
-    overflow: hidden; /* Taşan içeriği gizle */
-    position: relative; /* İçindeki butonu konumlandırmak için */
-    min-height: auto; /* Yüksekliği içeriğe göre ayarla */
-    text-align: left; /* Metni sola hizala (görünmese de) */
+    color: transparent; /* Hide text, only button will be visible */
+    overflow: hidden; /* Hide overflowing content */
+    position: relative; /* For positioning inner elements */
+    min-height: auto; /* Adjust height based on content */
+    text-align: left; /* Align text to the left (even if hidden) */
+    flex-shrink: 0; /* Prevent button and text from shrinking */
+    width: auto; /* Allow width to grow based on content */
 }
 
 input#pdf-file::before,
 input#joint-pdf-file::before {
-    content: 'Dosya seçin'; /* Placeholder gibi metin ekle */
+    content: ''; /* Remove 'Choose file' placeholder text, as "Choose File" button and "No file chosen" text are sufficient */
     position: absolute;
     left: 1rem;
     top: 50%;
     transform: translateY(-50%);
     color: var(--text-secondary);
     font-size: 1rem;
-    pointer-events: none; /* Üzerine tıklanabilir olmasın */
+    pointer-events: none; /* Not clickable */
 }
 
+/* Rule block starting at line 586 – düzeltilmiş yorum satırı ile */
 input#pdf-file::-webkit-file-upload-button,
 input#joint-pdf-file::-webkit-file-upload-button {
     background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
@@ -617,10 +621,17 @@ input#joint-pdf-file::-webkit-file-upload-button {
     font-size: 0.875rem;
     transition: all 0.3s ease;
     font-family: inherit;
-    margin-right: 1rem; /* Buton ile 'Dosya seçilmedi' arasında boşluk */
-    order: 1; /* Butonu sola al */
+    /* margin-right: 1rem; */       /* butonu metinden ayırmak için gerekiyorsa */
+    order: 1;                      /* Ensure button comes first */
+    align-self: center;           /* Vertically center itself */
+    
+    display: block;               /* Ensure button is a block element */
+    width: auto;                  /* Allow it to grow based on content */
+    min-width: 120px;             /* Keep button visible with minimum width */
+    margin: 0;                    /* Remove auto margins, flexbox will manage */
 }
 
+/* Hover efekti */
 input#pdf-file::-webkit-file-upload-button:hover,
 input#joint-pdf-file::-webkit-file-upload-button:hover {
     transform: translateY(-1px);
@@ -628,46 +639,21 @@ input#joint-pdf-file::-webkit-file-upload-button:hover {
 }
 
 .file-status {
-    margin-top: 0; /* Üst boşluğu kaldır */
+    margin-top: 0; /* Remove top margin */
     padding: 0.75rem 1rem;
     border-radius: var(--radius-md);
     font-size: 0.875rem;
     font-weight: 500;
     word-break: break-word;
-    text-align: left; /* Metni sola hizala */
-    order: 2; /* Metni sağa al */
-    flex-shrink: 0; /* Metnin sıkışmasını engelle */
+    text-align: left; /* Align text to the left */
+    order: 2; /* Position text to the right */
+    flex-shrink: 0; /* Prevent text from shrinking */
+    margin-left: -1rem; /* Negative margin to bring "No file chosen" text closer to the button */
 }
 
 input[type="file"]:hover {
     border-color: var(--primary);
     background: var(--bg-secondary);
-}
-
-/* Butonun kendisi (Webkit tabanlı tarayıcılar için) */
-input[type="file"]::-webkit-file-upload-button {
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-    color: white;
-    border: none;
-    padding: 0.75rem 1rem;
-    border-radius: var(--radius-md);
-    cursor: pointer;
-    font-weight: 500;
-    font-size: 0.875rem;
-    transition: all 0.3s ease;
-    font-family: inherit;
-    
-    display: block; /* Butonun blok eleman olmasını sağlayın */
-    width: auto; /* İçeriğine göre genişlesin */
-    min-width: 120px; /* Minimum genişlik vererek butonu görünür tutun */
-    margin: 0; /* Otomatik margin'leri kaldırın, flexbox yönetecek */
-    order: 1; /* Butonun önce gelmesini sağlar */
-    align-self: center; /* Kendini yatayda ortala */
-}
-
-input[type="file"]::-webkit-file-upload-button:hover {
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-md);
 }
 
 .course-code-display {
@@ -827,7 +813,7 @@ input[type="file"]::-webkit-file-upload-button:hover {
     }
 }
 
-/* Loading Overlay Styles (mobile-utils.js'den taşındı) */
+/* Loading Overlay Styles (moved from mobile-utils.js) */
 .loading-overlay {
     position: fixed;
     top: 0;
