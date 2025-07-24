@@ -18,7 +18,101 @@ document.addEventListener('DOMContentLoaded', function() {
             handlePdfFile('joint-pdf-file', 'joint-pdf-status', 'joint');
         });
     };
+
+    // Initialize course input listeners for both tabs
+    setupCourseInputListeners();
 });
+
+function setupCourseInputListeners() {
+    // Single tab course inputs
+    const singleCourseInputs = document.getElementById('course-inputs');
+    if (singleCourseInputs) {
+        setupCourseContainer(singleCourseInputs, 'preferred-sections-inputs');
+    }
+
+    // Joint tab course inputs
+    const person1CourseInputs = document.getElementById('person1-courses');
+    if (person1CourseInputs) {
+        setupCourseContainer(person1CourseInputs, 'person1-preferred-sections-inputs');
+    }
+
+    const person2CourseInputs = document.getElementById('person2-courses');
+    if (person2CourseInputs) {
+        setupCourseContainer(person2CourseInputs, 'person2-preferred-sections-inputs');
+    }
+}
+
+function setupCourseContainer(courseContainer, preferredSectionsId) {
+    const preferredSectionsContainer = document.getElementById(preferredSectionsId);
+    
+    // Monitor changes in course inputs
+    const observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+            if (mutation.type === 'childList') {
+                updatePreferredSections(courseContainer, preferredSectionsContainer);
+            }
+        });
+    });
+
+    observer.observe(courseContainer, {
+        childList: true,
+        subtree: true
+    });
+
+    // Monitor input value changes
+    courseContainer.addEventListener('input', debounce(function(e) {
+        if (e.target.type === 'text') {
+            updatePreferredSections(courseContainer, preferredSectionsContainer);
+        }
+    }, 300));
+
+    // Initial setup
+    updatePreferredSections(courseContainer, preferredSectionsContainer);
+}
+
+function updatePreferredSections(courseContainer, preferredSectionsContainer) {
+    if (!preferredSectionsContainer) return;
+
+    const courseInputs = courseContainer.querySelectorAll('input[type="text"]');
+    const courseCodes = Array.from(courseInputs)
+        .map(input => input.value.trim())
+        .filter(code => code);
+
+    // Clear existing preferred sections
+    preferredSectionsContainer.innerHTML = '';
+
+    // Add preferred section input for each course code
+    courseCodes.forEach(courseCode => {
+        if (courseCode) {
+            addPreferredSectionInput(courseCode, preferredSectionsContainer);
+        }
+    });
+}
+
+function addPreferredSectionInput(courseCode, container) {
+    const preferredSectionDiv = document.createElement('div');
+    preferredSectionDiv.className = 'preferred-section-input';
+    preferredSectionDiv.innerHTML = `
+        <div class="course-code-display">${courseCode}</div>
+        <input type="text" class="section-selection" placeholder="Şubeleri virgülle ayır (örn: 1,3)" autocomplete="off" />
+    `;
+    container.appendChild(preferredSectionDiv);
+}
+
+// Global functions for adding/removing courses
+window.addPreferredSectionInput = addPreferredSectionInput;
+
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
 
 async function extractTextFromPDF(file) {
     return new Promise((resolve, reject) => {
