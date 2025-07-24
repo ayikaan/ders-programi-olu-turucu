@@ -643,16 +643,15 @@ input#joint-pdf-file::-webkit-file-upload-button:hover {
 }
 
 .file-status {
-    margin-top: 0; /* Remove top margin */
+    margin-top: 0;
     padding: 0.75rem 1rem;
     border-radius: var(--radius-md);
     font-size: 0.875rem;
     font-weight: 500;
     word-break: break-word;
-    text-align: left; /* Align text to the left */
-    order: 2; /* Position text to the right */
-    flex-shrink: 0; /* Prevent text from shrinking */
-    margin-left: -1rem; /* Negative margin to bring "No file chosen" text closer to the button */
+    text-align: left;
+    order: 2;
+    flex-shrink: 0;
 }
 
 input[type="file"]:hover {
