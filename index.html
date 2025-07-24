@@ -10,10 +10,8 @@
     <title>Ders Programı Oluşturucu</title>
     <link rel="stylesheet" href="styles.css">
     
-    <!-- PWA Manifest -->
     <link rel="manifest" href="manifest.json">
     
-    <!-- Preconnect for performance -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
@@ -42,7 +40,7 @@
                         <label>Ders kodlarını ekleyin (örn: SE 1108)</label>
                         <div id="course-inputs">
                             <div class="course-input">
-                                <input type="text" placeholder="Ders kodu (örn: SE 1108)" autocomplete="off" />
+                                <input type="text" placeholder="Ders kodu (örn: SE 1108)" autocomplete="off" name="single_course_1" />
                                 <button class="btn btn-danger btn-small" onclick="removeCourse(this)" type="button">Sil</button>
                             </div>
                         </div>
@@ -64,11 +62,11 @@
                     <div class="time-range">
                         <div class="form-group">
                             <label>En Erken Başlama Saati</label>
-                            <input type="time" id="start-time" value="08:40" />
+                            <input type="time" id="start-time" value="08:40" name="single_start_time" />
                         </div>
                         <div class="form-group">
                             <label>En Geç Bitiş Saati</label>
-                            <input type="time" id="end-time" value="18:30" />
+                            <input type="time" id="end-time" value="18:30" name="single_end_time" />
                         </div>
                     </div>
                 </div>
@@ -77,7 +75,7 @@
                     <h2>📄 Ders Programı Dosyası</h2>
                     <div class="form-group">
                         <label>PDF dosyasını seçin</label>
-                        <input type="file" id="pdf-file" accept=".pdf" />
+                        <input type="file" id="pdf-file" accept=".pdf" name="single_pdf_file" />
                         <div id="pdf-status" class="file-status"></div>
                     </div>
                 </div>
@@ -91,7 +89,7 @@
                     <div class="form-group">
                         <div id="person1-courses">
                             <div class="course-input">
-                                <input type="text" placeholder="Ders kodu (örn: SE 1108)" autocomplete="off" />
+                                <input type="text" placeholder="Ders kodu (örn: SE 1108)" autocomplete="off" name="person1_course_1" />
                                 <button class="btn btn-danger btn-small" onclick="removeCourse(this)" type="button">Sil</button>
                             </div>
                         </div>
@@ -113,7 +111,7 @@
                     <div class="form-group">
                         <div id="person2-courses">
                             <div class="course-input">
-                                <input type="text" placeholder="Ders kodu (örn: MATH 1132)" autocomplete="off" />
+                                <input type="text" placeholder="Ders kodu (örn: MATH 1132)" autocomplete="off" name="person2_course_1" />
                                 <button class="btn btn-danger btn-small" onclick="removeCourse(this)" type="button">Sil</button>
                             </div>
                         </div>
@@ -135,11 +133,11 @@
                     <div class="time-range">
                         <div class="form-group">
                             <label>En Erken Başlama Saati</label>
-                            <input type="time" id="joint-start-time" value="08:40" />
+                            <input type="time" id="joint-start-time" value="08:40" name="joint_start_time" />
                         </div>
                         <div class="form-group">
                             <label>En Geç Bitiş Saati</label>
-                            <input type="time" id="joint-end-time" value="18:30" />
+                            <input type="time" id="joint-end-time" value="18:30" name="joint_end_time" />
                         </div>
                     </div>
                 </div>
@@ -148,7 +146,7 @@
                     <h2>📄 Ders Programı Dosyası</h2>
                     <div class="form-group">
                         <label>PDF dosyasını seçin</label>
-                        <input type="file" id="joint-pdf-file" accept=".pdf" />
+                        <input type="file" id="joint-pdf-file" accept=".pdf" name="joint_pdf_file" />
                         <div id="joint-pdf-status" class="file-status"></div>
                     </div>
                 </div>
@@ -160,7 +158,6 @@
         </div>
     </div>
 
-    <!-- Loading overlay for better UX -->
     <div id="loading-overlay" class="loading-overlay" style="display: none;">
         <div class="loading-content">
             <div class="spinner"></div>
