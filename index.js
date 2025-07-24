@@ -17,10 +17,10 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('joint-pdf-file')?.addEventListener('change', function() {
             handlePdfFile('joint-pdf-file', 'joint-pdf-status', 'joint');
         });
-    };
 
-    // Initialize course input listeners for both tabs
-    setupCourseInputListeners();
+        // Initialize course input listeners after PDF.js loads
+        setupCourseInputListeners();
+    };
 });
 
 function setupCourseInputListeners() {
@@ -45,29 +45,42 @@ function setupCourseInputListeners() {
 function setupCourseContainer(courseContainer, preferredSectionsId) {
     const preferredSectionsContainer = document.getElementById(preferredSectionsId);
     
-    // Monitor changes in course inputs
+    if (!preferredSectionsContainer) return;
+    
+    // Function to handle updates
+    const handleUpdate = debounce(function() {
+        updatePreferredSections(courseContainer, preferredSectionsContainer);
+    }, 100);
+
+    // Monitor changes in course inputs using event delegation
+    courseContainer.addEventListener('input', function(e) {
+        if (e.target.type === 'text') {
+            handleUpdate();
+        }
+    });
+
+    // Monitor DOM changes (when courses are added/removed)
     const observer = new MutationObserver(function(mutations) {
+        let shouldUpdate = false;
         mutations.forEach(function(mutation) {
             if (mutation.type === 'childList') {
-                updatePreferredSections(courseContainer, preferredSectionsContainer);
+                shouldUpdate = true;
             }
         });
+        if (shouldUpdate) {
+            handleUpdate();
+        }
     });
 
     observer.observe(courseContainer, {
         childList: true,
-        subtree: true
+        subtree: false
     });
 
-    // Monitor input value changes
-    courseContainer.addEventListener('input', debounce(function(e) {
-        if (e.target.type === 'text') {
-            updatePreferredSections(courseContainer, preferredSectionsContainer);
-        }
-    }, 300));
-
     // Initial setup
-    updatePreferredSections(courseContainer, preferredSectionsContainer);
+    setTimeout(() => {
+        updatePreferredSections(courseContainer, preferredSectionsContainer);
+    }, 50);
 }
 
 function updatePreferredSections(courseContainer, preferredSectionsContainer) {
@@ -304,6 +317,12 @@ function addCourse() {
     const input = newInput.querySelector('input');
     input.focus();
     if (navigator.vibrate) navigator.vibrate(10);
+    
+    // Trigger update for preferred sections
+    setTimeout(() => {
+        const event = new Event('input', { bubbles: true });
+        input.dispatchEvent(event);
+    }, 100);
 }
 
 function addCoursePerson1() {
@@ -319,6 +338,12 @@ function addCoursePerson1() {
     const input = newInput.querySelector('input');
     input.focus();
     if (navigator.vibrate) navigator.vibrate(10);
+    
+    // Trigger update for preferred sections
+    setTimeout(() => {
+        const event = new Event('input', { bubbles: true });
+        input.dispatchEvent(event);
+    }, 100);
 }
 
 function addCoursePerson2() {
@@ -334,6 +359,12 @@ function addCoursePerson2() {
     const input = newInput.querySelector('input');
     input.focus();
     if (navigator.vibrate) navigator.vibrate(10);
+    
+    // Trigger update for preferred sections
+    setTimeout(() => {
+        const event = new Event('input', { bubbles: true });
+        input.dispatchEvent(event);
+    }, 100);
 }
 
 function removeCourse(button) {
@@ -518,3 +549,17 @@ function getFreeDays(schedule) {
 
     return Array.from(allDays).filter(day => !busyDays.has(day)).sort();
 }
+// Initial setup - check existing inputs immediately
+    const existingInputs = courseContainer.querySelectorAll('input[type="text"]');
+    existingInputs.forEach(input => {
+        if (input.value.trim()) {
+            // Add preferred section input for existing course codes
+            const courseCode = input.value.trim();
+            addPreferredSectionInput(courseCode, preferredSectionsContainer);
+        }
+    });
+    
+    // Also run the general update after a delay
+    setTimeout(() => {
+        updatePreferredSections(courseContainer, preferredSectionsContainer);
+    }, 100);
