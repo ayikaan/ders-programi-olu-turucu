@@ -583,11 +583,14 @@ textarea:hover {
 input#pdf-file,
 input#joint-pdf-file {
     /* flex-grow: 1; /* Allow input to grow - REMOVE OR COMMENT THIS LINE */ */
-    padding: 1rem; /* Corrected: changed '}' to ';' */
+    padding: 1rem;
     border: 2px dashed var(--border);
     border-radius: var(--radius-md);
     background: var(--bg-input);
-    color: transparent; /* Hide text, only button will be visible */
+    /* Hide native text more effectively */
+    color: transparent; /* Keep text transparent */
+    font-size: 0; /* Collapse font size to hide native text */
+    line-height: 0; /* Collapse line height */
     overflow: hidden; /* Hide overflowing content */
     position: relative; /* For positioning inner elements */
     min-height: auto; /* Adjust height based on content */
@@ -604,7 +607,7 @@ input#joint-pdf-file::before {
     top: 50%;
     transform: translateY(-50%);
     color: var(--text-secondary);
-    font-size: 1rem;
+    font-size: 1rem; /* Ensure pseudo-element text is visible */
     pointer-events: none; /* Not clickable */
 }
 
@@ -618,7 +621,8 @@ input#joint-pdf-file::-webkit-file-upload-button {
     border-radius: var(--radius-md);
     cursor: pointer;
     font-weight: 500;
-    font-size: 0.875rem;
+    font-size: 0.875rem; /* Ensure button text is visible */
+    line-height: normal; /* Reset line-height for the button */
     transition: all 0.3s ease;
     font-family: inherit;
     /* margin-right: 1rem; */       /* butonu metinden ayırmak için gerekiyorsa */
