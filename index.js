@@ -1,10 +1,10 @@
-// index.js dosyasının TAMAMI (yalnızca değişen kısım değil, tamamen güncellenmiş hali)
-
+// index.js
+// Ortak değişkenler ve yardımcı fonksiyonlar buraya taşındı
 let pdfData = [];
 let jointPdfData = [];
 
+// PDF.js kütüphanesini yükle
 document.addEventListener('DOMContentLoaded', function() {
-    // PDF.js setup
     const script = document.createElement('script');
     script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
     document.head.appendChild(script);
@@ -12,136 +12,25 @@ document.addEventListener('DOMContentLoaded', function() {
     script.onload = function() {
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-        document.getElementById('pdf-file')?.addEventListener('change', function() {
-            handlePdfFile('pdf-file', 'pdf-status', 'pdf');
-        });
+        // PDF dosya inputlarına event listener ekle
+        const pdfFileInput = document.getElementById('pdf-file');
+        const jointPdfFileInput = document.getElementById('joint-pdf-file');
 
-        document.getElementById('joint-pdf-file')?.addEventListener('change', function() {
-            handlePdfFile('joint-pdf-file', 'joint-pdf-status', 'joint');
-        });
+        if (pdfFileInput) {
+            pdfFileInput.addEventListener('change', function() {
+                handlePdfFile('pdf-file', 'pdf-status', 'pdf');
+            });
+        }
 
-        // Initialize course input listeners after PDF.js loads
-        setupCourseInputListeners();
+        if (jointPdfFileInput) {
+            jointPdfFileInput.addEventListener('change', function() {
+                handlePdfFile('joint-pdf-file', 'joint-pdf-status', 'joint');
+            });
+        }
     };
 });
 
-function setupCourseInputListeners() {
-    // Single tab course inputs
-    const singleCourseInputs = document.getElementById('course-inputs');
-    if (singleCourseInputs) {
-        setupCourseContainer(singleCourseInputs, 'preferred-sections-inputs');
-    }
-
-    // Joint tab course inputs
-    const person1CourseInputs = document.getElementById('person1-courses');
-    if (person1CourseInputs) {
-        setupCourseContainer(person1CourseInputs, 'person1-preferred-sections-inputs');
-    }
-
-    const person2CourseInputs = document.getElementById('person2-courses');
-    if (person2CourseInputs) {
-        setupCourseContainer(person2CourseInputs, 'person2-preferred-sections-inputs');
-    }
-}
-
-function setupCourseContainer(courseContainer, preferredSectionsId) {
-    const preferredSectionsContainer = document.getElementById(preferredSectionsId);
-    
-    if (!preferredSectionsContainer) return;
-    
-    // Function to handle updates
-    const handleUpdate = debounce(function() {
-        updatePreferredSections(courseContainer, preferredSectionsContainer);
-    }, 100);
-
-    // Monitor changes in course inputs using event delegation
-    courseContainer.addEventListener('input', function(e) {
-        if (e.target.type === 'text') {
-            handleUpdate();
-        }
-    });
-
-    // Monitor DOM changes (when courses are added/removed)
-    const observer = new MutationObserver(function(mutations) {
-        let shouldUpdate = false;
-        mutations.forEach(function(mutation) {
-            if (mutation.type === 'childList') {
-                shouldUpdate = true;
-            }
-        });
-        if (shouldUpdate) {
-            handleUpdate();
-        }
-    });
-
-    observer.observe(courseContainer, {
-        childList: true,
-        subtree: false
-    });
-
-    // Initial setup for existing inputs when the container is set up
-    // This part should ensure existing inputs trigger preferred section setup ONCE.
-    // The debounce function in handleUpdate helps prevent rapid re-triggers.
-    setTimeout(() => {
-        updatePreferredSections(courseContainer, preferredSectionsContainer);
-    }, 50);
-} // Bu parantez, setupCourseContainer fonksiyonunun doğru kapanışıdır.
-  // Altındaki hatalı bloğu kaldırdık.
-
-function updatePreferredSections(courseContainer, preferredSectionsContainer) {
-    if (!preferredSectionsContainer) return;
-
-    const courseInputs = courseContainer.querySelectorAll('input[type="text"]');
-    const courseCodes = Array.from(courseInputs)
-        .map(input => input.value.trim())
-        .filter(code => code);
-
-    // Get current preferred section inputs to preserve their values
-    const currentPreferredSections = {};
-    preferredSectionsContainer.querySelectorAll('.preferred-section-input').forEach(div => {
-        const courseCodeDisplay = div.querySelector('.course-code-display').textContent;
-        const sectionInput = div.querySelector('.section-selection');
-        if (courseCodeDisplay) {
-            currentPreferredSections[courseCodeDisplay] = sectionInput ? sectionInput.value : '';
-        }
-    });
-
-    // Clear existing preferred sections
-    preferredSectionsContainer.innerHTML = '';
-
-    // Add preferred section input for each course code, restoring value if it existed
-    courseCodes.forEach(courseCode => {
-        if (courseCode) {
-            addPreferredSectionInput(courseCode, preferredSectionsContainer, currentPreferredSections[courseCode] || '');
-        }
-    });
-}
-
-function addPreferredSectionInput(courseCode, container, initialValue = '') {
-    const preferredSectionDiv = document.createElement('div');
-    preferredSectionDiv.className = 'preferred-section-input';
-    preferredSectionDiv.innerHTML = `
-        <div class="course-code-display">${courseCode}</div>
-        <input type="text" class="section-selection" placeholder="Şubeleri virgülle ayır (örn: 1,3)" autocomplete="off" value="${initialValue}" />
-    `;
-    container.appendChild(preferredSectionDiv);
-}
-
-// Global functions for adding/removing courses
-window.addPreferredSectionInput = addPreferredSectionInput; // Bu satırı koruyun.
-
-function debounce(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
-        const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-        };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-    };
-}
-
+// PDF'ten metin çıkarma fonksiyonu
 async function extractTextFromPDF(file) {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -157,16 +46,19 @@ async function extractTextFromPDF(file) {
                     let lastY = -1;
                     let lineBuffer = [];
                     for (const item of textContent.items) {
+                        // Yeni satır tespiti, y konumuna göre
                         if (lastY === -1 || Math.abs(item.transform[5] - lastY) > 10) {
                             if (lineBuffer.length > 0) {
                                 fullText += lineBuffer.join(' ').trim() + '\n';
                             }
                             lineBuffer = [item.str];
                         } else {
+                            // Aynı satırda ise boşluk ekle
                             lineBuffer.push(item.str);
                         }
                         lastY = item.transform[5];
                     }
+                    // Son satırı da ekle
                     if (lineBuffer.length > 0) {
                         fullText += lineBuffer.join(' ').trim() + '\n';
                     }
@@ -181,9 +73,12 @@ async function extractTextFromPDF(file) {
     });
 }
 
+// PDF metnini ayrıştırma fonksiyonu
 function parsePdfText(text) {
     const lines = text.split('\n').filter(line => line.trim());
     const data = [];
+    console.log("PDF'ten çıkarılan satırlar (parsePdfText içinde):", lines);
+
     const dayKeywords = ['PAZARTESİ', 'SALI', 'ÇARŞAMBA', 'PERŞEMBE', 'CUMA', 'CUMARTESİ', 'PAZAR'];
     const timeRegex = /\b(\d{2}:\d{2})\b/g;
     const courseCodeRegex = /\b([A-Z]{2,6}\s?\d{3,4})\b/i;
@@ -191,6 +86,9 @@ function parsePdfText(text) {
 
     for (let i = 0; i < lines.length; i++) {
         const line = lines[i];
+        const originalLine = line;
+        console.log(`İşlenen satır: "${originalLine}"`);
+
         let foundCourseCode = '';
         let foundSection = '';
         let foundDay = '';
@@ -252,13 +150,30 @@ function parsePdfText(text) {
 
         if (foundCourseCode && foundSection && foundDay && foundStartTime && foundEndTime) {
             data.push([
-                '', foundSection, foundCourseCode, foundDay, foundStartTime, foundEndTime, ''
+                '', // SIRA NO
+                foundSection, // Şube
+                foundCourseCode, // Ders Kodu
+                foundDay, // Gün
+                foundStartTime, // Başlangıç Saati
+                foundEndTime, // Bitiş Saati
+                '' // Derslik
             ]);
+            console.log(`Başarıyla ayrıştırıldı: Ders: ${foundCourseCode}, Şube: ${foundSection}, Gün: ${foundDay}, Saat: ${foundStartTime}-${foundEndTime}`);
+        } else {
+            console.warn(`Ayrıştırma başarısız oldu (eksik bilgi): Satır: "${originalLine}"`, {
+                code: foundCourseCode,
+                section: foundSection,
+                day: foundDay,
+                start: foundStartTime,
+                end: foundEndTime
+            });
         }
     }
+    console.log(`parsePdfText fonksiyonu tamamlandı. Toplam ${data.length} satır ayrıştırıldı.`);
     return data;
 }
 
+// PDF dosyasını işleme fonksiyonu
 async function handlePdfFile(fileInputId, statusId, dataVariable) {
     const fileInput = document.getElementById(fileInputId);
     const statusDiv = document.getElementById(statusId);
@@ -295,49 +210,43 @@ async function handlePdfFile(fileInputId, statusId, dataVariable) {
     }
 }
 
+// Sekme değiştirme fonksiyonu
 function switchTab(tabName) {
     document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
     document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
 
-    event.target.closest('.tab').classList.add('active');
+    event.target.classList.add('active');
     document.getElementById(tabName + '-tab').classList.add('active');
 
+    // Tüm çıktıları, durum mesajlarını ve dosya inputlarını temizle
     document.getElementById('results').innerHTML = '';
     document.getElementById('pdf-status').innerHTML = '';
     document.getElementById('joint-pdf-status').innerHTML = '';
 
+    // PDF inputlarını sıfırla
     const pdfFileInputSingle = document.getElementById('pdf-file');
     const pdfFileInputJoint = document.getElementById('joint-pdf-file');
 
     if (pdfFileInputSingle) {
-        pdfFileInputSingle.value = '';
-        pdfData = [];
+        pdfFileInputSingle.value = ''; // Inputu sıfırla
+        pdfData = []; // Saklanan PDF verisini sıfırla
     }
     if (pdfFileInputJoint) {
-        pdfFileInputJoint.value = '';
-        jointPdfData = [];
+        pdfFileInputJoint.value = ''; // Inputu sıfırla
+        jointPdfData = []; // Saklanan ortak PDF verisini sıfırla
     }
 }
 
+// Yardımcı UI fonksiyonları
 function addCourse() {
     const courseInputs = document.getElementById('course-inputs');
     const newInput = document.createElement('div');
     newInput.className = 'course-input';
     newInput.innerHTML = `
-        <input type="text" placeholder="Ders kodu (örn: SE 1108)" autocomplete="off" />
-        <button class="btn btn-danger btn-small" onclick="removeCourse(this)" type="button">Sil</button>
+        <input type="text" placeholder="Ders kodu (örn: SE 1108)" />
+        <button class="btn btn-danger btn-small" onclick="removeCourse(this)">Sil</button>
     `;
     courseInputs.appendChild(newInput);
-    
-    const input = newInput.querySelector('input');
-    input.focus();
-    if (navigator.vibrate) navigator.vibrate(10);
-    
-    // Trigger update for preferred sections
-    setTimeout(() => {
-        const event = new Event('input', { bubbles: true });
-        input.dispatchEvent(event);
-    }, 100);
 }
 
 function addCoursePerson1() {
@@ -345,20 +254,10 @@ function addCoursePerson1() {
     const newInput = document.createElement('div');
     newInput.className = 'course-input';
     newInput.innerHTML = `
-        <input type="text" placeholder="Ders kodu (örn: SE 1108)" autocomplete="off" />
-        <button class="btn btn-danger btn-small" onclick="removeCourse(this)" type="button">Sil</button>
+        <input type="text" placeholder="Ders kodu (örn: SE 1108)" />
+        <button class="btn btn-danger btn-small" onclick="removeCourse(this)">Sil</button>
     `;
     courseInputs.appendChild(newInput);
-    
-    const input = newInput.querySelector('input');
-    input.focus();
-    if (navigator.vibrate) navigator.vibrate(10);
-    
-    // Trigger update for preferred sections
-    setTimeout(() => {
-        const event = new Event('input', { bubbles: true });
-        input.dispatchEvent(event);
-    }, 100);
 }
 
 function addCoursePerson2() {
@@ -366,27 +265,17 @@ function addCoursePerson2() {
     const newInput = document.createElement('div');
     newInput.className = 'course-input';
     newInput.innerHTML = `
-        <input type="text" placeholder="Ders kodu (örn: MATH 1132)" autocomplete="off" />
-        <button class="btn btn-danger btn-small" onclick="removeCourse(this)" type="button">Sil</button>
+        <input type="text" placeholder="Ders kodu (örn: MATH 1132)" />
+        <button class="btn btn-danger btn-small" onclick="removeCourse(this)">Sil</button>
     `;
     courseInputs.appendChild(newInput);
-    
-    const input = newInput.querySelector('input');
-    input.focus();
-    if (navigator.vibrate) navigator.vibrate(10);
-    
-    // Trigger update for preferred sections
-    setTimeout(() => {
-        const event = new Event('input', { bubbles: true });
-        input.dispatchEvent(event);
-    }, 100);
 }
 
 function removeCourse(button) {
     button.parentElement.remove();
-    if (navigator.vibrate) navigator.vibrate(15);
 }
 
+// Sonuçları ekrana basan fonksiyon (her iki program tipi de kullanabilir)
 function displayResults(schedules, startTime, endTime, isJoint = false) {
     const resultsDiv = document.getElementById('results');
 
@@ -406,7 +295,7 @@ function displayResults(schedules, startTime, endTime, isJoint = false) {
     `;
 
     schedules.forEach((schedule, index) => {
-        const freeDays = getFreeDays(isJoint ? schedule.person1Schedule : schedule);
+        const freeDays = getFreeDays(isJoint ? schedule.person1Schedule : schedule); // Ortak programda ayrı bir yapıya sahip olabilir
         const commonFreeDays = isJoint ? calculateCommonFreeDays(schedule.person1Schedule, schedule.person2Schedule) : null;
         const commonFreeHours = isJoint ? calculateCommonFreeHours(schedule.person1Schedule, schedule.person2Schedule) : null;
 
@@ -455,7 +344,7 @@ function displayResults(schedules, startTime, endTime, isJoint = false) {
                 `;
             }
 
-        } else {
+        } else { // Tekil Program
             for (const [courseName, option] of Object.entries(schedule)) {
                 html += `
                     <div class="course-item">
@@ -485,6 +374,7 @@ function displayResults(schedules, startTime, endTime, isJoint = false) {
     resultsDiv.innerHTML = html;
 }
 
+// Ders, Şube ve Zaman Dilimi Sınıfları (Global olarak kalsın ki tüm scriptler erişebilsin)
 class TimeSlot {
     constructor(day, startTime, endTime) {
         this.day = day;
@@ -526,6 +416,7 @@ class Course {
     }
 }
 
+// Zaman aralığı kontrolü (her iki program tipi de kullanabilir)
 function timeInRange(start, end, check) {
     const startTime = new Date(`1970-01-01T${start}:00`);
     const endTime = new Date(`1970-01-01T${end}:00`);
@@ -534,8 +425,9 @@ function timeInRange(start, end, check) {
 }
 
 function isScheduleWithinTimeRange(schedule, startTime, endTime) {
+    // isJoint parametresi kontrolü eklendi, ancak varsayılan olarak tekil program bekler
     let schedulesToCheck = [schedule];
-    if (schedule.person1Schedule && schedule.person2Schedule) {
+    if (schedule.person1Schedule && schedule.person2Schedule) { // Ortak program yapısı ise
         schedulesToCheck = [schedule.person1Schedule, schedule.person2Schedule];
     }
 
@@ -552,6 +444,7 @@ function isScheduleWithinTimeRange(schedule, startTime, endTime) {
     return true;
 }
 
+// Boş günleri hesaplama (her iki program tipi de kullanabilir)
 function getFreeDays(schedule) {
     const allDays = new Set(['PAZARTESİ', 'SALI', 'ÇARŞAMBA', 'PERŞEMBE', 'CUMA']);
     const busyDays = new Set();

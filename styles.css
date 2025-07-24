@@ -32,11 +32,6 @@
     --radius-xl: 20px;
 }
 
-html {
-    -webkit-text-size-adjust: 100%;
-    -webkit-tap-highlight-color: transparent;
-}
-
 * {
     margin: 0;
     padding: 0;
@@ -50,17 +45,17 @@ body {
     line-height: 1.6;
     font-weight: 400;
     min-height: 100vh;
-    padding: 1rem;
+    padding: 2rem;
     background-image: 
         radial-gradient(circle at 25% 25%, #8b5cf620 0%, transparent 50%),
         radial-gradient(circle at 75% 75%, #06b6d420 0%, transparent 50%);
 }
 
 .container {
-    max-width: 100%;
+    max-width: 1400px;
     margin: 0 auto;
     background: var(--bg-card);
-    border-radius: var(--radius-lg);
+    border-radius: var(--radius-xl);
     box-shadow: var(--shadow-xl);
     border: 1px solid var(--border);
     overflow: hidden;
@@ -69,7 +64,7 @@ body {
 
 .header {
     background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-    padding: 2rem 1rem;
+    padding: 3rem 2rem;
     text-align: center;
     position: relative;
     overflow: hidden;
@@ -87,7 +82,7 @@ body {
 }
 
 .header h1 {
-    font-size: clamp(1.8rem, 5vw, 3.5rem);
+    font-size: clamp(2.5rem, 5vw, 3.5rem);
     font-weight: 700;
     color: white;
     margin-bottom: 0.5rem;
@@ -97,7 +92,7 @@ body {
 }
 
 .header p {
-    font-size: clamp(0.9rem, 3vw, 1.125rem);
+    font-size: 1.125rem;
     color: rgba(255, 255, 255, 0.9);
     font-weight: 400;
     position: relative;
@@ -105,7 +100,7 @@ body {
 }
 
 .content {
-    padding: 1rem;
+    padding: 2.5rem;
 }
 
 .tabs {
@@ -113,27 +108,22 @@ body {
     background: var(--bg-secondary);
     border-radius: var(--radius-lg);
     padding: 0.5rem;
-    margin-bottom: 1.5rem;
+    margin-bottom: 2rem;
     gap: 0.5rem;
-    flex-wrap: wrap;
 }
 
 .tab {
     flex: 1;
-    min-width: 120px;
-    padding: 0.875rem 1rem;
+    padding: 1rem 1.5rem;
     text-align: center;
     border-radius: var(--radius-md);
     cursor: pointer;
     font-weight: 500;
-    font-size: 0.875rem;
+    font-size: 0.95rem;
     color: var(--text-secondary);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
     overflow: hidden;
-    touch-action: manipulation;
-    -webkit-user-select: none;
-    user-select: none;
 }
 
 .tab::before {
@@ -153,7 +143,7 @@ body {
     z-index: 1;
 }
 
-.tab:hover, .tab:active {
+.tab:hover {
     color: var(--text-primary);
     transform: translateY(-1px);
 }
@@ -190,8 +180,8 @@ body {
 }
 
 .section {
-    margin-bottom: 1.5rem;
-    padding: 1.5rem 1rem;
+    margin-bottom: 2rem;
+    padding: 2rem;
     background: var(--bg-card);
     border-radius: var(--radius-lg);
     border: 1px solid var(--border);
@@ -223,18 +213,17 @@ body {
 }
 
 .section h2 {
-    font-size: clamp(1.25rem, 4vw, 1.5rem);
+    font-size: 1.5rem;
     font-weight: 600;
     color: var(--text-primary);
-    margin-bottom: 1.25rem;
+    margin-bottom: 1.5rem;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    flex-wrap: wrap;
+    gap: 0.75rem;
 }
 
 .form-group {
-    margin-bottom: 1.25rem;
+    margin-bottom: 1.5rem;
 }
 
 label {
@@ -242,15 +231,16 @@ label {
     margin-bottom: 0.5rem;
     font-weight: 500;
     color: var(--text-secondary);
-    font-size: 0.875rem;
+    font-size: 0.925rem;
 }
 
 input[type="text"], 
 input[type="time"], 
+input[type="file"], 
 select, 
 textarea {
     width: 100%;
-    padding: 1rem;
+    padding: 1rem 1.25rem;
     border: 2px solid var(--border);
     border-radius: var(--radius-md);
     font-size: 1rem;
@@ -259,8 +249,6 @@ textarea {
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     font-family: inherit;
     outline: none;
-    /* appearance ve -webkit-appearance kaldırıldı */
-    /* -moz-appearance kaldırıldı */
 }
 
 input[type="text"]:focus, 
@@ -282,9 +270,9 @@ textarea:hover {
 
 .course-input {
     display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
+    gap: 1rem;
     margin-bottom: 1rem;
+    align-items: flex-start;
 }
 
 .course-input input {
@@ -292,7 +280,7 @@ textarea:hover {
 }
 
 .btn {
-    padding: 1rem 1.5rem;
+    padding: 0.875rem 1.5rem;
     border: none;
     border-radius: var(--radius-md);
     cursor: pointer;
@@ -305,11 +293,6 @@ textarea:hover {
     outline: none;
     text-transform: none;
     letter-spacing: 0;
-    touch-action: manipulation;
-    -webkit-user-select: none;
-    user-select: none;
-    width: 100%;
-    min-height: 48px;
 }
 
 .btn::before {
@@ -323,7 +306,7 @@ textarea:hover {
     transition: left 0.5s;
 }
 
-.btn:hover::before, .btn:active::before {
+.btn:hover::before {
     left: 100%;
 }
 
@@ -333,7 +316,7 @@ textarea:hover {
     box-shadow: var(--shadow-md);
 }
 
-.btn-primary:hover, .btn-primary:active {
+.btn-primary:hover {
     transform: translateY(-2px);
     box-shadow: var(--shadow-lg);
 }
@@ -344,7 +327,7 @@ textarea:hover {
     box-shadow: var(--shadow-sm);
 }
 
-.btn-secondary:hover, .btn-secondary:active {
+.btn-secondary:hover {
     transform: translateY(-1px);
     box-shadow: var(--shadow-md);
 }
@@ -355,17 +338,15 @@ textarea:hover {
     box-shadow: var(--shadow-sm);
 }
 
-.btn-danger:hover, .btn-danger:active {
+.btn-danger:hover {
     transform: translateY(-1px);
     box-shadow: var(--shadow-md);
 }
 
 .btn-small {
-    padding: 0.75rem 1rem;
+    padding: 0.625rem 1rem;
     font-size: 0.875rem;
     border-radius: var(--radius-sm);
-    min-height: 40px;
-    width: auto;
 }
 
 .btn:active {
@@ -380,18 +361,18 @@ textarea:hover {
 
 .time-range {
     display: grid;
-    grid-template-columns: 1fr;
-    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
 }
 
 .results {
-    margin-top: 1.5rem;
+    margin-top: 2rem;
 }
 
 .schedule-card {
     background: var(--bg-card);
     border-radius: var(--radius-lg);
-    padding: 1.5rem 1rem;
+    padding: 2rem;
     margin-bottom: 1.5rem;
     box-shadow: var(--shadow-md);
     border: 1px solid var(--border);
@@ -411,32 +392,31 @@ textarea:hover {
 }
 
 .schedule-card:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-lg);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-xl);
 }
 
 .schedule-card h3 {
-    font-size: clamp(1.2rem, 4vw, 1.375rem);
+    font-size: 1.375rem;
     font-weight: 600;
     color: var(--primary);
-    margin-bottom: 1.25rem;
+    margin-bottom: 1.5rem;
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    flex-wrap: wrap;
 }
 
 .schedule-card h4 {
-    font-size: clamp(1rem, 3vw, 1.125rem);
+    font-size: 1.125rem;
     font-weight: 500;
     color: var(--text-secondary);
-    margin: 1.25rem 0 1rem 0;
+    margin: 1.5rem 0 1rem 0;
     padding-bottom: 0.5rem;
     border-bottom: 2px solid var(--bg-secondary);
 }
 
 .course-item {
-    padding: 1rem;
+    padding: 1.25rem 1.5rem;
     background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
     border-radius: var(--radius-md);
     margin-bottom: 0.75rem;
@@ -457,8 +437,8 @@ textarea:hover {
     transition: width 0.3s ease;
 }
 
-.course-item:hover, .course-item:active {
-    transform: translateX(2px);
+.course-item:hover {
+    transform: translateX(4px);
     box-shadow: var(--shadow-md);
 }
 
@@ -470,33 +450,30 @@ textarea:hover {
 .course-name {
     font-weight: 600;
     color: var(--text-primary);
-    font-size: 0.95rem;
+    font-size: 1rem;
     margin-bottom: 0.25rem;
-    word-break: break-word;
 }
 
 .course-details {
     color: var(--text-secondary);
-    font-size: 0.875rem;
+    font-size: 0.925rem;
     line-height: 1.5;
-    word-break: break-word;
 }
 
 .free-days {
     background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
     color: #065f46;
-    padding: 1rem;
+    padding: 1rem 1.25rem;
     border-radius: var(--radius-md);
     margin-top: 1rem;
     font-weight: 500;
     border-left: 4px solid var(--success);
-    font-size: 0.875rem;
-    word-break: break-word;
+    font-size: 0.925rem;
 }
 
 .loading {
     text-align: center;
-    padding: 3rem 1rem;
+    padding: 4rem 2rem;
     color: var(--text-secondary);
 }
 
@@ -517,43 +494,37 @@ textarea:hover {
 .error {
     background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
     color: #7f1d1d;
-    padding: 1rem;
+    padding: 1.25rem 1.5rem;
     border-radius: var(--radius-md);
-    margin: 1rem 0;
+    margin: 1.5rem 0;
     border-left: 4px solid var(--danger);
     font-weight: 500;
     box-shadow: var(--shadow-sm);
-    word-break: break-word;
 }
 
 .success {
     background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
     color: #14532d;
-    padding: 1rem;
+    padding: 1.25rem 1.5rem;
     border-radius: var(--radius-md);
-    margin: 1rem 0;
+    margin: 1.5rem 0;
     border-left: 4px solid var(--success);
     font-weight: 500;
     box-shadow: var(--shadow-sm);
-    word-break: break-word;
 }
 
 .file-status {
-    margin-top: 0.5rem;
-    padding: 0.75rem 1rem;
+    margin-top: 1rem;
+    padding: 1rem 1.25rem;
     border-radius: var(--radius-md);
-    font-size: 0.875rem;
+    font-size: 0.925rem;
     font-weight: 500;
-    word-break: break-word;
-    text-align: left; /* Changed from center to left */
-    order: 3;
-    width: 100%;
 }
 
 .file-status.success {
     background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
     color: #14532d;
-    border-left: 4px solid var(--success); /* Changed from 44px to 4px */
+    border-left: 4px solid var(--success);
 }
 
 .file-status.error {
@@ -568,102 +539,57 @@ textarea:hover {
     border-left: 4px solid var(--text-muted);
 }
 
-.form-group:has(input#pdf-file),
-.form-group:has(input#joint-pdf-file) {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    flex-wrap: wrap;
+input[type="file"] {
+    background: var(--bg-input);
+    cursor: pointer;
+    border: 2px dashed var(--border);
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.3s ease;
     position: relative;
 }
 
-input#pdf-file,
-input#joint-pdf-file {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    opacity: 0;
-    cursor: pointer;
-    z-index: 10;
-    padding: 0;
-    border: none;
-    background: transparent;
-}
-
-.form-group:has(input#pdf-file)::before,
-.form-group:has(input#joint-pdf-file)::before {
-    content: "PDF dosyasını seçin";
-    display: flex;
-    align-items: center;
-    flex-grow: 1;
-    padding: 1rem;
-    border: 2px dashed var(--border);
-    border-radius: var(--radius-md);
-    background: var(--bg-input);
-    color: var(--text-secondary);
-    font-size: 1rem;
-    font-family: inherit;
-    min-height: 48px;
-    box-sizing: border-box;
-    order: 1;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.form-group:has(input#pdf-file)::after,
-.form-group:has(input#joint-pdf-file)::after {
-    content: "Dosya Seç";
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-    color: white;
-    border: none;
-    padding: 0.75rem 1rem;
-    border-radius: var(--radius-md);
-    cursor: pointer;
-    font-weight: 500;
-    font-size: 0.875rem;
-    line-height: normal;
-    transition: all 0.3s ease;
-    font-family: inherit;
-    min-width: 120px;
-    min-height: 48px;
-    box-sizing: border-box;
-    order: 2;
-}
-
-.form-group:has(input#pdf-file):hover::before,
-.form-group:has(input#joint-pdf-file):hover::before {
+input[type="file"]:hover {
     border-color: var(--primary);
     background: var(--bg-secondary);
 }
 
-.form-group:has(input#pdf-file):hover::after,
-.form-group:has(input#joint-pdf-file):hover::after {
+input[type="file"]::-webkit-file-upload-button {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    font-weight: 500;
+    margin-right: 1rem;
+    font-size: 0.925rem;
+    transition: all 0.3s ease;
+    font-family: inherit;
+}
+
+input[type="file"]::-webkit-file-upload-button:hover {
     transform: translateY(-1px);
     box-shadow: var(--shadow-md);
 }
 
 .course-code-display {
     font-weight: 600;
-    min-width: 80px;
+    min-width: 120px;
     color: var(--primary);
-    font-size: 0.875rem;
+    font-size: 0.925rem;
     letter-spacing: 0.025em;
-    word-break: break-word;
 }
 
 .preferred-section-input {
     background: var(--bg-card);
     border: 1px solid var(--border);
     border-radius: var(--radius-md);
-    padding: 1rem;
+    padding: 1rem 1.25rem;
     margin-bottom: 0.75rem;
     display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
+    align-items: center;
+    gap: 1rem;
     transition: all 0.3s ease;
 }
 
@@ -675,328 +601,88 @@ input#joint-pdf-file {
 .section-selection {
     border: 1.5px solid var(--border) !important;
     border-radius: var(--radius-sm) !important;
-    padding: 0.75rem !important;
-    font-size: 0.875rem !important;
+    padding: 0.625rem 1rem !important;
+    font-size: 0.925rem !important;
     flex: 1;
 }
 
-@media (hover: none) and (pointer: coarse) {
-    .btn:hover, .tab:hover, .course-item:hover, .section:hover, .schedule-card:hover {
-        transform: none;
-    }
-    
-    .btn:active, .tab:active {
-        transform: scale(0.98);
-        opacity: 0.8;
-    }
-}
-
+/* Custom Scrollbar */
 ::-webkit-scrollbar {
-    width: 4px;
-    height: 4px;
+    width: 8px;
+    height: 8px;
 }
 
 ::-webkit-scrollbar-track {
     background: var(--bg-secondary);
-    border-radius: 2px;
+    border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb {
     background: linear-gradient(180deg, var(--primary), var(--secondary));
-    border-radius: 2px;
+    border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
     background: linear-gradient(180deg, var(--primary-dark), var(--primary));
 }
 
-@media (min-width: 480px) {
+/* Responsive Design */
+@media (max-width: 768px) {
     body {
-        padding: 1.5rem;
-    }
-    
-    .content {
-        padding: 1.5rem;
-    }
-    
-    .section {
-        padding: 2rem 1.5rem;
-    }
-    
-    .schedule-card {
-        padding: 2rem 1.5rem;
-    }
-    
-    .course-input {
-        flex-direction: row;
-        align-items: flex-start;
-        gap: 1rem;
-    }
-    
-    .preferred-section-input {
-        flex-direction: row;
-        align-items: center;
-        gap: 1rem;
-    }
-    
-    .btn {
-        width: auto;
-    }
-    
-    .btn-small {
-        width: auto;
-    }
-}
-
-@media (min-width: 768px) {
-    body {
-        padding: 2rem;
+        padding: 1rem;
     }
     
     .container {
-        max-width: 1400px;
-        border-radius: var(--radius-xl);
+        border-radius: var(--radius-lg);
     }
     
     .content {
-        padding: 2.5rem;
+        padding: 1.5rem;
+    }
+    
+    .header {
+        padding: 2rem 1.5rem;
     }
     
     .section {
-        padding: 2rem;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
     }
     
-    .schedule-card {
-        padding: 2rem;
-    }
-    
-    .time-range {
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 1.5rem;
+    .course-input {
+        flex-direction: column;
+        gap: 0.75rem;
     }
     
     .tabs {
-        margin-bottom: 2rem;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .time-range {
+        grid-template-columns: 1fr;
+    }
+    
+    .preferred-section-input {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.75rem;
     }
     
     .course-code-display {
-        min-width: 120px;
-    }
-    .form-group:has(input#pdf-file),
-    .form-group:has(input#joint-pdf-file) {
-        flex-wrap: nowrap;
-    }
-
-    .form-group:has(input#pdf-file)::before,
-    .form-group:has(input#joint-pdf-file)::before {
-        flex-grow: 1;
-    }
-
-    .form-group:has(input#pdf-file)::after,
-    .form-group:has(input#joint-pdf-file)::after {
-        flex-shrink: 0;
+        min-width: auto;
     }
 }
 
+/* Focus States */
 *:focus-visible {
     outline: 2px solid var(--primary);
     outline-offset: 2px;
 }
 
-@media screen and (max-width: 767px) {
-    input[type="text"], 
-    input[type="time"], 
-    select, 
-    textarea {
-        font-size: 16px;
-    }
-}
-
-.loading-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.8);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 10000;
-    backdrop-filter: blur(5px);
-}
-
-.loading-content {
-    background: white;
-    padding: 2rem;
-    border-radius: 1rem;
-    text-align: center;
-    max-width: 80%;
-    margin: 0 1rem;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-}
-
-.loading-content p {
-    margin-top: 1rem;
-    color: var(--text-secondary);
-    font-weight: 500;
-    font-size: 0.9rem;
-}
-
-@media (max-width: 480px) {
-    .loading-content {
-        padding: 1.5rem;
-        max-width: 90%;
-    }
-    
-    .schedule-card {
-        margin-bottom: 1rem;
-        padding: 1rem;
-    }
-    
-    .course-item {
-        padding: 0.75rem;
-        margin-bottom: 0.5rem;
-    }
-    
-    .course-name {
-        font-size: 0.9rem;
-    }
-    
-    .course-details {
-        font-size: 0.8rem;
-    }
-    
-    .free-days {
-        padding: 0.75rem;
-        font-size: 0.8rem;
-    }
-    
-    .btn {
-        padding: 0.875rem 1rem;
-        font-size: 0.9rem;
-    }
-    
-    .btn-small {
-        padding: 0.625rem 0.75rem;
-        font-size: 0.8rem;
-    }
-    .form-group:has(input#pdf-file),
-    .form-group:has(input#joint-pdf-file) {
-        flex-direction: row;
-        flex-wrap: wrap;
-        align-items: stretch;
-    }
-
-    .form-group:has(input#pdf-file)::before,
-    .form-group:has(input#joint-pdf-file)::before {
-        flex-basis: calc(100% - 120px - 1rem);
-        flex-grow: 1;
-        flex-shrink: 1;
-        order: 1;
-    }
-
-    .form-group:has(input#pdf-file)::after,
-    .form-group:has(input#joint-pdf-file)::after {
-        flex-basis: 120px;
-        flex-grow: 0;
-        flex-shrink: 0;
-        order: 2;
-    }
-}
-
-@media (max-width: 480px) and (max-height: 800px) {
-    .section {
-        margin-bottom: 1rem;
-        padding: 1rem 0.75rem;
-    }
-    
-    .header {
-        padding: 1.5rem 1rem;
-    }
-    
-    .content {
-        padding: 0.75rem;
-    }
-    
-    .spinner {
-        width: 36px;
-        height: 36px;
-    }
-}
-
-@media (max-width: 900px) and (orientation: landscape) {
-    .header {
-        padding: 1rem;
-    }
-    
-    .header h1 {
-        font-size: 1.8rem;
-    }
-    
-    .header p {
-        font-size: 0.9rem;
-    }
-    
-    .section {
-        padding: 1rem;
-    }
-    
-    .time-range {
-        grid-template-columns: 1fr 1fr;
-    }
-}
-
-@media (prefers-color-scheme: dark) {
-    :root {
-        --bg-primary: #0f172a;
-        --bg-secondary: #1e293b;
-        --bg-card: #1e293b;
-        --bg-input: #334155;
-        --text-primary: #f8fafc;
-        --text-secondary: #cbd5e1;
-        --text-muted: #94a3b8;
-        --border: #334155;
-    }
-    
-    .loading-content {
-        background: var(--bg-card);
-        color: var(--text-primary);
-    }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    *,
-    *::before,
-    *::after {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
-        scroll-behavior: auto !important;
-    }
-    
-    .spinner {
-        animation: none;
-        border: 4px solid var(--primary);
-    }
-}
-
-@media (prefers-contrast: high) {
-    .btn {
-        border: 2px solid currentColor;
-    }
-    
-    .course-item {
-        border: 1px solid var(--text-primary);
-    }
-    
-    .section {
-        border: 2px solid var(--border);
-    }
-}
-
+/* Print Styles */
 @media print {
-    .btn, .tabs, input, select, .loading-overlay {
+    .btn, .tabs, input, select {
         display: none !important;
     }
     
@@ -1004,10 +690,5 @@ input#joint-pdf-file {
         break-inside: avoid;
         box-shadow: none;
         border: 1px solid #000;
-    }
-    
-    .header {
-        background: none;
-        color: #000;
     }
 }

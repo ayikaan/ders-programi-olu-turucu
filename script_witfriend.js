@@ -1,4 +1,4 @@
-// script_witfriend.js - Mobile Optimized
+// script_witfriend.js
 
 // Ortak program için dersleri oluşturma
 function buildJointCourses(personCourseCodes, pdfDataArray, preferredSections = {}) {
@@ -70,15 +70,22 @@ function buildJointCourses(personCourseCodes, pdfDataArray, preferredSections = 
     return coursesDict;
 }
 
-// Ortak programları oluşturan ana backtracking fonksiyonu - Mobile optimized
-function generateJointSchedulesLogic(person1CoursesDict, person2CoursesDict, commonCourseCodes) {
+// Ortak programları oluşturan ana backtracking fonksiyonu
+function generateJointSchedulesLogic(
+    person1CoursesDict,
+    person2CoursesDict,
+    commonCourseCodes
+) {
     const results = [];
     const allUniqueCourseCodes = [...new Set([...Object.keys(person1CoursesDict), ...Object.keys(person2CoursesDict)])];
     
-    // Mobile performance limit
-    const maxSchedules = window.innerWidth < 768 ? 300 : 500;
+    const maxSchedules = 500; // Üretilecek maksimum program sayısı sınırı
 
-    function backtrackJoint(idx, currentSchedule1, currentSchedule2) {
+    function backtrackJoint(
+        idx,
+        currentSchedule1,
+        currentSchedule2
+    ) {
         if (results.length >= maxSchedules) {
             return;
         }
@@ -92,6 +99,7 @@ function generateJointSchedulesLogic(person1CoursesDict, person2CoursesDict, com
         }
 
         const courseCode = allUniqueCourseCodes[idx];
+
         const isCommon = commonCourseCodes.includes(courseCode);
 
         const p1Options = person1CoursesDict[courseCode] ? person1CoursesDict[courseCode].options : [null];
@@ -159,6 +167,7 @@ function calculateCommonFreeDays(schedule1, schedule2) {
 
 // İki programın ortak boş saatlerini hesaplama (30 dakikalık bloklar halinde)
 function calculateCommonFreeHours(schedule1, schedule2) {
+    const fmt = "%H:%M";
     const halfHourBlocks = [];
     for (let h = 8; h <= 20; h++) {
         halfHourBlocks.push(`${h.toString().padStart(2, '0')}:00`);
@@ -193,16 +202,10 @@ function calculateCommonFreeHours(schedule1, schedule2) {
     return commonFreeCount;
 }
 
-// Ortak program oluşturma ana fonksiyonu - Mobile optimized
+// Ortak program oluşturma ana fonksiyonu (index.html'den çağrılacak)
 async function generateJointSchedule() {
     const resultsDiv = document.getElementById('results');
-    
-    // Mobile loading overlay
-    if (window.mobileUtils) {
-        window.mobileUtils.showLoadingOverlay('Ortak program oluşturuluyor...');
-    } else {
-        resultsDiv.innerHTML = '<div class="loading"><div class="spinner"></div>Ortak program oluşturuluyor...</div>';
-    }
+    resultsDiv.innerHTML = '<div class="loading"><div class="spinner"></div>Ortak program oluşturuluyor...</div>';
 
     try {
         const person1CourseInputs = document.querySelectorAll('#person1-courses input[type="text"]');
@@ -239,6 +242,10 @@ async function generateJointSchedule() {
             }
         });
 
+        console.log("Kişi 1 tercih edilen şubeler:", person1PreferredSections);
+        console.log("Kişi 2 tercih edilen şubeler:", person2PreferredSections);
+
+
         if (person1CourseCodes.length === 0 && person2CourseCodes.length === 0) {
             throw new Error('Her iki kişi için de en az bir ders kodu girmelisiniz.');
         }
@@ -257,20 +264,17 @@ async function generateJointSchedule() {
         const jointStartTime = document.getElementById('joint-start-time').value;
         const jointEndTime = document.getElementById('joint-end-time').value;
 
-        // Mobile progress updates
-        if (window.mobileUtils) {
-            window.mobileUtils.showLoadingOverlay('Dersler analiz ediliyor...');
-        }
-
         const person1CoursesDict = buildJointCourses(person1CourseCodes, jointPdfData, person1PreferredSections);
         const person2CoursesDict = buildJointCourses(person2CourseCodes, jointPdfData, person2PreferredSections);
+
         const commonCourseCodes = [...new Set(person1CourseCodes)].filter(code => person2CourseCodes.includes(code));
 
-        if (window.mobileUtils) {
-            window.mobileUtils.showLoadingOverlay('Ortak programlar hesaplanıyor...');
-        }
+        const allJointSchedules = generateJointSchedulesLogic(
+            person1CoursesDict,
+            person2CoursesDict,
+            commonCourseCodes
+        );
 
-        const allJointSchedules = generateJointSchedulesLogic(person1CoursesDict, person2CoursesDict, commonCourseCodes);
         const filteredJointSchedules = allJointSchedules.filter(schedule =>
             isScheduleWithinTimeRange(schedule, jointStartTime, jointEndTime)
         );
@@ -283,33 +287,16 @@ async function generateJointSchedule() {
 
         window.currentDisplayedJointSchedules = filteredJointSchedules;
         window.currentJointSchedulePageIndex = 0;
-        const programsPerPageJoint = window.innerWidth < 768 ? 8 : 20; // Less on mobile
+        const programsPerPageJoint = 20;
 
-        if (window.mobileUtils) window.mobileUtils.hideLoadingOverlay();
         displayPaginatedJointResults(window.currentDisplayedJointSchedules, programsPerPageJoint, jointStartTime, jointEndTime);
 
-        // Scroll to results on mobile
-        if (window.innerWidth < 768) {
-            setTimeout(() => {
-                document.getElementById('results').scrollIntoView({ 
-                    behavior: 'smooth', 
-                    block: 'start' 
-                });
-            }, 100);
-        }
-
     } catch (error) {
-        if (window.mobileUtils) window.mobileUtils.hideLoadingOverlay();
         resultsDiv.innerHTML = `<div class="error">❌ Hata: ${error.message}</div>`;
-        
-        // Mobile haptic feedback
-        if (navigator.vibrate) {
-            navigator.vibrate([100, 50, 100]);
-        }
     }
 }
 
-// Ortak program sonuçlarını sayfalayarak gösteren yardımcı fonksiyon - Mobile optimized
+// Ortak program sonuçlarını sayfalayarak gösteren yardımcı fonksiyon
 function displayPaginatedJointResults(schedules, programsPerPage, startTime, endTime) {
     const resultsDiv = document.getElementById('results');
     let html = '';
@@ -329,13 +316,11 @@ function displayPaginatedJointResults(schedules, programsPerPage, startTime, end
                 ✅ Toplam ${schedules.length} adet uygun ortak program bulundu!
             </div>
         `;
-        
-        // Mobile performance warning
-        const maxSchedules = window.innerWidth < 768 ? 300 : 500;
-        if (schedules.length >= maxSchedules) {
+        if (schedules.length >= 500) {
             resultsDiv.insertAdjacentHTML('beforeend', `
                 <div class="error" style="background: #fff3cd; color: #856404; border-left: 4px solid #ffc107;">
-                    ${window.innerWidth < 768 ? '📱' : '⚠️'} ${window.innerWidth < 768 ? 'Mobil performans için' : 'Çok fazla kombinasyon nedeniyle'} arama ${maxSchedules} program ile sınırlandı.
+                    ⚠️ Çok fazla program kombinasyonu oluştuğu için arama 500 program ile kısıtlandı.
+                    Daha az ders seçmeyi veya şube filtrelemeyi deneyin.
                 </div>
             `);
         }
@@ -353,9 +338,8 @@ function displayPaginatedJointResults(schedules, programsPerPage, startTime, end
         html += `
             <div class="schedule-card" id="joint-program-card-${actualIndex}">
                 <h3>📋 Ortak Program ${actualIndex + 1}</h3>
-                <h4>👥 Kişi 1 Programı:</h4>
+                <h4>Kişi 1 Programı:</h4>
         `;
-        
         for (const [courseName, option] of Object.entries(schedule.person1Schedule)) {
             html += `
                 <div class="course-item">
@@ -364,9 +348,7 @@ function displayPaginatedJointResults(schedules, programsPerPage, startTime, end
                 </div>
             `;
         }
-        
-        html += `<h4>👤 Kişi 2 Programı:</h4>`;
-        
+        html += `<h4>Kişi 2 Programı:</h4>`;
         for (const [courseName, option] of Object.entries(schedule.person2Schedule)) {
             html += `
                 <div class="course-item">
@@ -389,24 +371,21 @@ function displayPaginatedJointResults(schedules, programsPerPage, startTime, end
                 </div>
             `;
         }
-        
         if (commonFreeHours !== null) {
             html += `
                 <div class="free-days" style="background: #e0f7fa; color: #00796b;">
-                    ⏰ Ortak Boş Saat (30dk blok): ${commonFreeHours}
+                    ⏰ Ortak Boş Saat (30dk'lık bloklar): ${commonFreeHours}
                 </div>
             `;
         }
 
+        // PDF İndir butonu
         html += `
-                <button class="btn btn-secondary btn-small download-joint-pdf-btn" data-program-index="${actualIndex}" style="margin-top: 10px;">
-                    📄 PDF İndir
-                </button>
+                <button class="btn btn-secondary btn-small download-joint-pdf-btn" data-program-index="${actualIndex}" style="margin-top: 10px;">PDF İndir</button>
             </div>
         `;
     });
 
-    // Remove existing load more button
     let loadMoreButtonJoint = document.getElementById('load-more-joint-schedules');
     if (loadMoreButtonJoint) {
         loadMoreButtonJoint.remove();
@@ -414,45 +393,35 @@ function displayPaginatedJointResults(schedules, programsPerPage, startTime, end
 
     resultsDiv.insertAdjacentHTML('beforeend', html);
 
-    // Add load more button if needed
     if (endIndex < schedules.length) {
         loadMoreButtonJoint = document.createElement('button');
         loadMoreButtonJoint.id = 'load-more-joint-schedules';
         loadMoreButtonJoint.className = 'btn btn-secondary';
-        loadMoreButtonJoint.textContent = `Daha Fazla Göster (${schedules.length - endIndex} kaldı)`;
+        loadMoreButtonJoint.textContent = 'Daha Fazla Göster';
         loadMoreButtonJoint.style.marginTop = '20px';
         loadMoreButtonJoint.onclick = loadMoreJointSchedules;
         resultsDiv.appendChild(loadMoreButtonJoint);
     }
 
-    // PDF download event listeners
+    // PDF İndir butonlarına tıklama olay dinleyicisi ekle
     document.querySelectorAll('.download-joint-pdf-btn').forEach(button => {
         button.onclick = function() {
             const programIndex = this.dataset.programIndex;
-            downloadJointProgramAsPdf(programIndex, this);
+            downloadJointProgramAsPdf(programIndex, this); // Butonu da fonksiyona geçir
         };
     });
 }
 
-// Ortak program "Daha Fazla Göster" butonuna tıklanınca çalışacak fonksiyon - Mobile optimized
+// Ortak program "Daha Fazla Göster" butonuna tıklanınca çalışacak fonksiyon
 function loadMoreJointSchedules() {
-    const loadButton = document.getElementById('load-more-joint-schedules');
-    if (loadButton) {
-        loadButton.textContent = 'Yükleniyor...';
-        loadButton.disabled = true;
-    }
-    
     window.currentJointSchedulePageIndex++;
-    const programsPerPageJoint = window.innerWidth < 768 ? 8 : 20;
-    
-    setTimeout(() => {
-        displayPaginatedJointResults(window.currentDisplayedJointSchedules, programsPerPageJoint, 
-                                     document.getElementById('joint-start-time').value, 
-                                     document.getElementById('joint-end-time').value);
-    }, 100);
+    const programsPerPageJoint = 20;
+    displayPaginatedJointResults(window.currentDisplayedJointSchedules, programsPerPageJoint, 
+                                 document.getElementById('joint-start-time').value, 
+                                 document.getElementById('joint-end-time').value);
 }
 
-// Ortak Programı PDF olarak indirme fonksiyonu - Mobile optimized
+// Ortak Programı PDF olarak indirme fonksiyonu
 async function downloadJointProgramAsPdf(programIndex, downloadButton) {
     const programCard = document.getElementById(`joint-program-card-${programIndex}`);
     if (!programCard) {
@@ -460,73 +429,53 @@ async function downloadJointProgramAsPdf(programIndex, downloadButton) {
         return;
     }
 
-    // Mobile button state
-    const originalButtonText = downloadButton.innerHTML;
-    downloadButton.innerHTML = '⏳ İndiriliyor...';
+    // Buton durumunu ayarla
+    const originalButtonText = downloadButton.textContent;
+    downloadButton.textContent = 'İndiriliyor...';
     downloadButton.disabled = true;
     downloadButton.style.opacity = '0.7';
-    
-    // Haptic feedback
-    if (navigator.vibrate) {
-        navigator.vibrate(20);
-    }
 
-    // Mobile loading overlay
-    if (window.mobileUtils && window.innerWidth < 768) {
-        window.mobileUtils.showLoadingOverlay('Ortak PDF hazırlanıyor...');
+    // jsPDF ve html2canvas kütüphanelerini dinamik olarak yükle
+    if (typeof html2canvas === 'undefined' || typeof jspdf === 'undefined') {
+        const scriptHtml2canvas = document.createElement('script');
+        scriptHtml2canvas.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+        document.head.appendChild(scriptHtml2canvas);
+
+        const scriptJsPDF = document.createElement('script');
+        scriptJsPDF.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+        document.head.appendChild(scriptJsPDF);
+
+        await Promise.all([
+            new Promise(resolve => scriptHtml2canvas.onload = resolve),
+            new Promise(resolve => scriptJsPDF.onload = resolve)
+        ]);
     }
 
     try {
-        // Load libraries dynamically
-        if (typeof html2canvas === 'undefined' || typeof jspdf === 'undefined') {
-            const loadScript = (src) => {
-                return new Promise((resolve, reject) => {
-                    const script = document.createElement('script');
-                    script.src = src;
-                    script.onload = resolve;
-                    script.onerror = reject;
-                    document.head.appendChild(script);
-                });
-            };
-
-            await Promise.all([
-                loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js'),
-                loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js')
-            ]);
-        }
-
-        // Create clean card copy
+        // Kartın bir kopyasını oluştur ve içindeki butonu kaldır
         const tempCard = programCard.cloneNode(true);
         const tempButton = tempCard.querySelector('.download-joint-pdf-btn');
         if (tempButton) {
             tempButton.remove();
         }
 
-        // Mobile-optimized container
+        // Geçici kartı görünmez bir alana ekle
         const tempContainer = document.createElement('div');
         tempContainer.style.position = 'absolute';
         tempContainer.style.left = '-9999px';
-        tempContainer.style.width = window.innerWidth < 768 ? '350px' : '600px';
         tempContainer.appendChild(tempCard);
         document.body.appendChild(tempContainer);
 
-        // Generate canvas with mobile settings
-        const canvas = await html2canvas(tempCard, { 
-            scale: window.innerWidth < 768 ? 1.5 : 2,
-            useCORS: true,
-            allowTaint: true,
-            backgroundColor: '#ffffff'
-        });
-        
-        const imgData = canvas.toDataURL('image/png', 0.8);
+        const canvas = await html2canvas(tempCard, { scale: 2 });
+        const imgData = canvas.toDataURL('image/png');
         const pdf = new window.jspdf.jsPDF({
-            orientation: 'p',
+            orientation: 'p', // 'p' dikey, 'l' yatay
             unit: 'mm',
             format: 'a4'
         });
 
-        const imgWidth = 210;
-        const pageHeight = 297;
+        const imgWidth = 210; // A4 genişliği mm
+        const pageHeight = 297; // A4 yüksekliği mm
         const imgHeight = canvas.height * imgWidth / canvas.width;
         let heightLeft = imgHeight;
         let position = 0;
@@ -541,73 +490,124 @@ async function downloadJointProgramAsPdf(programIndex, downloadButton) {
             heightLeft -= pageHeight;
         }
         
-        const filename = `ortak_program_${parseInt(programIndex) + 1}_${new Date().getTime()}.pdf`;
-        pdf.save(filename);
+        pdf.save(`ortak_program_${parseInt(programIndex) + 1}.pdf`);
 
         document.body.removeChild(tempContainer);
         
-        // Success haptic feedback
-        if (navigator.vibrate) {
-            navigator.vibrate([50, 50, 50]);
-        }
-        
     } catch (error) {
         console.error("Ortak PDF indirme hatası:", error);
-        
-        // Mobile error handling
-        if (window.innerWidth < 768) {
-            const errorDiv = document.createElement('div');
-            errorDiv.className = 'error';
-            errorDiv.textContent = '❌ PDF indirilirken hata oluştu. Tekrar deneyin.';
-            errorDiv.style.position = 'fixed';
-            errorDiv.style.top = '20px';
-            errorDiv.style.left = '20px';
-            errorDiv.style.right = '20px';
-            errorDiv.style.zIndex = '9999';
-            document.body.appendChild(errorDiv);
-            
-            setTimeout(() => errorDiv.remove(), 4000);
-        } else {
-            alert("Ortak PDF indirilirken bir hata oluştu. Lütfen tekrar deneyin.");
-        }
-        
-        // Error haptic feedback
-        if (navigator.vibrate) {
-            navigator.vibrate([100, 50, 100]);
-        }
-        
+        alert("Ortak PDF indirilirken bir hata oluştu. Lütfen tekrar deneyin.");
     } finally {
-        // Reset button state
-        downloadButton.innerHTML = originalButtonText;
+        // İşlem bittiğinde butonu eski haline getir
+        downloadButton.textContent = originalButtonText;
         downloadButton.disabled = false;
         downloadButton.style.opacity = '1';
-        
-        if (window.mobileUtils) {
-            window.mobileUtils.hideLoadingOverlay();
-        }
     }
 }
 
-// Mobile-optimized course management for joint schedules (primarily handled by index.js now)
+
+// Ortak program için ders inputlarına ve silme butonlarına olay dinleyicileri
 document.addEventListener('DOMContentLoaded', function() {
-    // The main logic for handling course inputs and preferred sections
-    // is now centralized in index.js via setupCourseContainer.
-    // This block is kept minimal to avoid re-initializing or conflicting.
+    const person1CoursesContainer = document.getElementById('person1-courses');
+    const person1PreferredSectionsContainer = document.getElementById('person1-preferred-sections-inputs');
+
+    const person2CoursesContainer = document.getElementById('person2-courses');
+    const person2PreferredSectionsContainer = document.getElementById('person2-preferred-sections-inputs');
+
+    // Yardımcı fonksiyon: Ortak program şube seçimi inputu ekle
+    function addPreferredSectionInputJoint(courseCode, targetContainer) {
+        const normalizedCode = courseCode.toUpperCase().replace(/\s/g, '');
+        if (targetContainer.querySelector(`.preferred-section-input[data-course-code="${normalizedCode}"]`)) {
+            return;
+        }
+        const newPreferredSectionDiv = document.createElement('div');
+        newPreferredSectionDiv.className = 'course-input preferred-section-input';
+        newPreferredSectionDiv.dataset.courseCode = normalizedCode;
+
+        newPreferredSectionDiv.innerHTML = `
+            <span class="course-code-display" style="font-weight: 600; min-width: 100px;">${courseCode}</span>
+            <input type="text" class="section-selection" placeholder="Şubeleri virgülle ayır (örn: 1,3)" />
+        `;
+        targetContainer.appendChild(newPreferredSectionDiv);
+    }
+
+    // Yardımcı fonksiyon: Ortak program şube seçimi inputu güncelle
+    function updatePreferredSectionInputJoint(originalCode, newCode, targetContainer) {
+        const normalizedOriginalCode = originalCode.toUpperCase().replace(/\s/g, '');
+        const normalizedNewCode = newCode.toUpperCase().replace(/\s/g, '');
+        const existingDiv = targetContainer.querySelector(`.preferred-section-input[data-course-code="${normalizedOriginalCode}"]`);
+
+        if (existingDiv) {
+            if (newCode.trim() === '') {
+                existingDiv.remove();
+            } else {
+                existingDiv.dataset.courseCode = normalizedNewCode;
+                existingDiv.querySelector('.course-code-display').textContent = newCode.toUpperCase();
+            }
+        } else if (newCode.trim() !== '') {
+            addPreferredSectionInputJoint(newCode, targetContainer);
+        }
+    }
+
+    // Dinleyici ekleme fonksiyonu (tekrar eden koddan kaçınmak için)
+    function setupCourseListeners(container, preferredSectionsContainer) {
+        container.querySelectorAll('input[type="text"]').forEach(input => {
+            if (input.value.trim() !== '') {
+                addPreferredSectionInputJoint(input.value.trim(), preferredSectionsContainer);
+                input.dataset.originalCourseCode = input.value.trim();
+            }
+        });
+
+        container.addEventListener('input', function(event) {
+            if (event.target.tagName === 'INPUT' && event.target.type === 'text') {
+                const originalCode = event.target.dataset.originalCourseCode || '';
+                const newCode = event.target.value.trim();
+                updatePreferredSectionInputJoint(originalCode, newCode, preferredSectionsContainer);
+                event.target.dataset.originalCourseCode = newCode;
+            }
+        });
+
+        container.addEventListener('click', function(event) {
+            if (event.target.classList.contains('btn-danger') && event.target.classList.contains('btn-small')) {
+                const courseInputDiv = event.target.closest('.course-input');
+                const courseCodeInput = courseInputDiv.querySelector('input[type="text"]');
+                if (courseCodeInput && courseCodeInput.value.trim()) {
+                    const courseCode = courseCodeInput.value.trim().toUpperCase();
+                    const preferredSectionDiv = preferredSectionsContainer.querySelector(`.preferred-section-input[data-course-code="${courseCode.replace(/\s/g, '')}"]`);
+                    if (preferredSectionDiv) {
+                        preferredSectionDiv.remove();
+                    }
+                }
+            }
+        });
+    }
+
+    setupCourseListeners(person1CoursesContainer, person1PreferredSectionsContainer);
+    setupCourseListeners(person2CoursesContainer, person2PreferredSectionsContainer);
+
+    window.addCoursePerson1 = function() {
+        const newInputDiv = document.createElement('div');
+        newInputDiv.className = 'course-input';
+        newInputDiv.innerHTML = `
+            <input type="text" placeholder="Ders kodu (örn: SE 1108)" />
+            <button class="btn btn-danger btn-small" onclick="removeCourse(this)">Sil</button>
+        `;
+        person1CoursesContainer.appendChild(newInputDiv);
+        const newCourseInput = newInputDiv.querySelector('input[type="text"]');
+        newCourseInput.focus();
+    };
+
+    window.addCoursePerson2 = function() {
+        const newInputDiv = document.createElement('div');
+        newInputDiv.className = 'course-input';
+        newInputDiv.innerHTML = `
+            <input type="text" placeholder="Ders kodu (örn: MATH 1132)" />
+            <button class="btn btn-danger btn-small" onclick="removeCourse(this)">Sil</button>
+        `;
+        person2CoursesContainer.appendChild(newInputDiv);
+        const newCourseInput = newInputDiv.querySelector('input[type="text"]');
+        newCourseInput.focus();
+    };
 });
 
-// Debounce utility (defined globally in index.js for consistency)
-// Keeping it here for local scope if needed, but not strictly necessary if global debounce is used.
-function debounce(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
-        const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-        };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-    };
-}
-
-// Export for global access
 window.generateJointSchedule = generateJointSchedule;

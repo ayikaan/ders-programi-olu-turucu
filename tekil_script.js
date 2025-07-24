@@ -1,4 +1,4 @@
-// tekil_script.js - Mobile Optimized - FIXED
+// tekil_script.js
 
 // Ders nesnelerini PDF verilerinden oluşturma
 function buildCourses(courseCodes, pdfDataArray, preferredSections = {}) {
@@ -72,17 +72,11 @@ function buildCourses(courseCodes, pdfDataArray, preferredSections = {}) {
     return courses;
 }
 
-// Programları geri izleme (backtracking) ile oluşturma - Mobile optimized
+// Programları geri izleme (backtracking) ile oluşturma
 function generateSchedules(courses) {
     const results = [];
-    const maxResults = 1000; // Limit for mobile performance
 
     function backtrack(index, current) {
-        // Performance optimization for mobile
-        if (results.length >= maxResults) {
-            return;
-        }
-
         if (index === courses.length) {
             results.push({...current});
             return;
@@ -106,16 +100,10 @@ function generateSchedules(courses) {
     return results;
 }
 
-// Tekil program oluşturma ana fonksiyonu - Mobile optimized
+// Tekil program oluşturma ana fonksiyonu (index.html'den çağrılacak)
 async function generateSchedule() {
     const resultsDiv = document.getElementById('results');
-    
-    // Show mobile loading overlay
-    if (window.mobileUtils) {
-        window.mobileUtils.showLoadingOverlay('Program oluşturuluyor...');
-    } else {
-        resultsDiv.innerHTML = '<div class="loading"><div class="spinner"></div>Program oluşturuluyor...</div>';
-    }
+    resultsDiv.innerHTML = '<div class="loading"><div class="spinner"></div>Program oluşturuluyor...</div>';
 
     try {
         const courseInputs = document.querySelectorAll('#course-inputs input[type="text"]');
@@ -124,18 +112,28 @@ async function generateSchedule() {
             .filter(code => code);
 
         const preferredSections = {};
-        document.querySelectorAll('#preferred-sections-inputs .preferred-section-input').forEach(div => {
-            const courseCodeDisplay = div.querySelector('.course-code-display').textContent;
-            const sectionInput = div.querySelector('.section-selection');
-            if (courseCodeDisplay && sectionInput && sectionInput.value.trim()) {
-                const sections = sectionInput.value.split(',').map(s => s.trim()).filter(s => s);
-                if (sections.length > 0) {
-                    preferredSections[courseCodeDisplay] = sections;
+        const allCourseInputDivs = document.querySelectorAll('#course-inputs .course-input');
+        
+        allCourseInputDivs.forEach(div => {
+            const courseCodeInput = div.querySelector('input[type="text"]');
+            if (courseCodeInput && courseCodeInput.value.trim()) {
+                const courseCode = courseCodeInput.value.trim().toUpperCase();
+                const preferredSectionInputDiv = document.querySelector(`.preferred-section-input[data-course-code="${courseCode.replace(/\s/g, '')}"]`);
+                
+                if (preferredSectionInputDiv) {
+                    const sectionInput = preferredSectionInputDiv.querySelector('.section-selection');
+                    if (sectionInput && sectionInput.value.trim()) {
+                        const sections = sectionInput.value.split(',').map(s => s.trim()).filter(s => s);
+                        if (sections.length > 0) {
+                            preferredSections[courseCode] = sections;
+                        }
+                    }
                 }
             }
         });
         
         console.log("Kullanıcının tercih ettiği şubeler:", preferredSections);
+
 
         if (courseCodes.length === 0) {
             throw new Error('En az bir ders kodu girmelisiniz.');
@@ -155,15 +153,9 @@ async function generateSchedule() {
         const startTime = document.getElementById('start-time').value;
         const endTime = document.getElementById('end-time').value;
 
-        // Show progress for mobile
-        if (window.mobileUtils) {
-            window.mobileUtils.showLoadingOverlay('Dersler analiz ediliyor...');
-        }
-
         const courses = buildCourses(courseCodes, pdfData, preferredSections);
 
         if (courses.length === 0) {
-            if (window.mobileUtils) window.mobileUtils.hideLoadingOverlay();
             resultsDiv.innerHTML = `
                 <div class="error">
                     ❌ Girilen ders kodlarında ve/veya seçilen şubelerde uygun program bulunamadı. Lütfen ders kodlarını, şube seçimlerini ve PDF dosyasının formatını kontrol edin.
@@ -172,53 +164,23 @@ async function generateSchedule() {
             return;
         }
 
-        // Show progress for mobile
-        if (window.mobileUtils) {
-            window.mobileUtils.showLoadingOverlay('Programlar oluşturuluyor...');
-        }
-
-        // Use requestIdleCallback for better mobile performance
-        const generateSchedulesAsync = () => {
-            return new Promise((resolve) => {
-                const schedules = generateSchedules(courses);
-                resolve(schedules);
-            });
-        };
-
-        const allSchedules = await generateSchedulesAsync();
+        const allSchedules = generateSchedules(courses);
         const filteredSchedules = allSchedules.filter(schedule =>
             isScheduleWithinTimeRange(schedule, startTime, endTime)
         );
 
         window.currentDisplayedSchedules = filteredSchedules;
         window.currentSchedulePageIndex = 0;
-        const programsPerPage = window.innerWidth < 768 ? 10 : 20; // Less per page on mobile
+        const programsPerPage = 20;
 
-        if (window.mobileUtils) window.mobileUtils.hideLoadingOverlay();
         displayPaginatedResults(window.currentDisplayedSchedules, programsPerPage, startTime, endTime);
 
-        // Scroll to results on mobile
-        if (window.innerWidth < 768) {
-            setTimeout(() => {
-                document.getElementById('results').scrollIntoView({ 
-                    behavior: 'smooth', 
-                    block: 'start' 
-                });
-            }, 100);
-        }
-
     } catch (error) {
-        if (window.mobileUtils) window.mobileUtils.hideLoadingOverlay();
         resultsDiv.innerHTML = `<div class="error">❌ Hata: ${error.message}</div>`;
-        
-        // Haptic feedback for error
-        if (navigator.vibrate) {
-            navigator.vibrate([100, 50, 100]);
-        }
     }
 }
 
-// Sonuçları sayfalayarak gösteren yardımcı fonksiyon - Mobile optimized
+// Sonuçları sayfalayarak gösteren yardımcı fonksiyon
 function displayPaginatedResults(schedules, programsPerPage, startTime, endTime) {
     const resultsDiv = document.getElementById('results');
     let html = '';
@@ -238,15 +200,6 @@ function displayPaginatedResults(schedules, programsPerPage, startTime, endTime)
                 ✅ Toplam ${schedules.length} adet uygun program bulundu!
             </div>
         `;
-        
-        // Performance warning for mobile
-        if (schedules.length > 500 && window.innerWidth < 768) {
-            resultsDiv.insertAdjacentHTML('beforeend', `
-                <div class="error" style="background: #fff3cd; color: #856404; border-left: 4px solid #ffc107;">
-                    📱 Mobil cihazda daha iyi performans için ilk 500 program gösteriliyor.
-                </div>
-            `);
-        }
     }
 
     const startIndex = window.currentSchedulePageIndex * programsPerPage;
@@ -286,14 +239,11 @@ function displayPaginatedResults(schedules, programsPerPage, startTime, endTime)
         }
         
         html += `
-                <button class="btn btn-secondary btn-small download-pdf-btn" data-program-index="${actualIndex}" style="margin-top: 10px;">
-                    📄 PDF İndir
-                </button>
+                <button class="btn btn-secondary btn-small download-pdf-btn" data-program-index="${actualIndex}" style="margin-top: 10px;">PDF İndir</button>
             </div>
         `;
     });
 
-    // Remove existing load more button
     let loadMoreButton = document.getElementById('load-more-schedules');
     if (loadMoreButton) {
         loadMoreButton.remove();
@@ -301,46 +251,34 @@ function displayPaginatedResults(schedules, programsPerPage, startTime, endTime)
 
     resultsDiv.insertAdjacentHTML('beforeend', html);
 
-    // Add load more button if needed
     if (endIndex < schedules.length) {
         loadMoreButton = document.createElement('button');
         loadMoreButton.id = 'load-more-schedules';
         loadMoreButton.className = 'btn btn-secondary';
-        loadMoreButton.textContent = `Daha Fazla Göster (${schedules.length - endIndex} kaldı)`;
+        loadMoreButton.textContent = 'Daha Fazla Göster';
         loadMoreButton.style.marginTop = '20px';
         loadMoreButton.onclick = loadMoreSchedules;
         resultsDiv.appendChild(loadMoreButton);
     }
 
-    // Add PDF download event listeners
     document.querySelectorAll('.download-pdf-btn').forEach(button => {
         button.onclick = function() {
             const programIndex = this.dataset.programIndex;
-            downloadProgramAsPdf(programIndex, this);
+            downloadProgramAsPdf(programIndex, this); // Butonu da fonksiyona geçir
         };
     });
 }
 
-// "Daha Fazla Göster" butonuna tıklanınca çalışacak fonksiyon - Mobile optimized
+// "Daha Fazla Göster" butonuna tıklanınca çalışacak fonksiyon
 function loadMoreSchedules() {
-    // Show loading state
-    const loadButton = document.getElementById('load-more-schedules');
-    if (loadButton) {
-        loadButton.textContent = 'Yükleniyor...';
-        loadButton.disabled = true;
-    }
-    
     window.currentSchedulePageIndex++;
-    const programsPerPage = window.innerWidth < 768 ? 10 : 20;
-    
-    setTimeout(() => {
-        displayPaginatedResults(window.currentDisplayedSchedules, programsPerPage, 
-                                document.getElementById('start-time').value, 
-                                document.getElementById('end-time').value);
-    }, 100);
+    const programsPerPage = 20;
+    displayPaginatedResults(window.currentDisplayedSchedules, programsPerPage, 
+                            document.getElementById('start-time').value, 
+                            document.getElementById('end-time').value);
 }
 
-// Programı PDF olarak indirme fonksiyonu - Mobile optimized
+// Programı PDF olarak indirme fonksiyonu
 async function downloadProgramAsPdf(programIndex, downloadButton) {
     const programCard = document.getElementById(`program-card-${programIndex}`);
     if (!programCard) {
@@ -348,65 +286,44 @@ async function downloadProgramAsPdf(programIndex, downloadButton) {
         return;
     }
 
-    // Mobile-optimized button state
+    // Buton durumunu ayarla
     const originalButtonText = downloadButton.textContent;
-    downloadButton.innerHTML = '⏳ İndiriliyor...';
+    downloadButton.textContent = 'İndiriliyor...';
     downloadButton.disabled = true;
-    downloadButton.style.opacity = '0.7';
-    
-    // Haptic feedback
-    if (navigator.vibrate) {
-        navigator.vibrate(20);
+    downloadButton.style.opacity = '0.7'; // Görsel geribildirim için saydamlık
+
+    // jsPDF ve html2canvas kütüphanelerini dinamik olarak yükle
+    if (typeof html2canvas === 'undefined' || typeof jspdf === 'undefined') {
+        const scriptHtml2canvas = document.createElement('script');
+        scriptHtml2canvas.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+        document.head.appendChild(scriptHtml2canvas);
+
+        const scriptJsPDF = document.createElement('script');
+        scriptJsPDF.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+        document.head.appendChild(scriptJsPDF);
+
+        await Promise.all([
+            new Promise(resolve => scriptHtml2canvas.onload = resolve),
+            new Promise(resolve => scriptJsPDF.onload = resolve)
+        ]);
     }
 
-    // Show loading overlay on mobile
-    if (window.mobileUtils && window.innerWidth < 768) {
-        window.mobileUtils.showLoadingOverlay('PDF hazırlanıyor...');
-    }
-
-    // Dynamic library loading with error handling
     try {
-        if (typeof html2canvas === 'undefined' || typeof jspdf === 'undefined') {
-            const loadScript = (src) => {
-                return new Promise((resolve, reject) => {
-                    const script = document.createElement('script');
-                    script.src = src;
-                    script.onload = resolve;
-                    script.onerror = reject;
-                    document.head.appendChild(script);
-                });
-            };
-
-            await Promise.all([
-                loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js'),
-                loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js')
-            ]);
-        }
-
-        // Create temporary card without button
         const tempCard = programCard.cloneNode(true);
         const tempButton = tempCard.querySelector('.download-pdf-btn');
         if (tempButton) {
             tempButton.remove();
         }
 
-        // Create temporary container
         const tempContainer = document.createElement('div');
         tempContainer.style.position = 'absolute';
         tempContainer.style.left = '-9999px';
-        tempContainer.style.width = window.innerWidth < 768 ? '350px' : '600px'; // Mobile-optimized width
         tempContainer.appendChild(tempCard);
         document.body.appendChild(tempContainer);
 
-        // Generate canvas with mobile-optimized settings
-        const canvas = await html2canvas(tempCard, { 
-            scale: window.innerWidth < 768 ? 1.5 : 2,
-            useCORS: true,
-            allowTaint: true,
-            backgroundColor: '#ffffff'
-        });
-        
-        const imgData = canvas.toDataURL('image/png', 0.8); // Reduced quality for mobile
+
+        const canvas = await html2canvas(tempCard, { scale: 2 });
+        const imgData = canvas.toDataURL('image/png');
         const pdf = new window.jspdf.jsPDF({
             orientation: 'p',
             unit: 'mm',
@@ -429,54 +346,107 @@ async function downloadProgramAsPdf(programIndex, downloadButton) {
             heightLeft -= pageHeight;
         }
         
-        // Mobile-friendly filename
-        const filename = `program_${parseInt(programIndex) + 1}_${new Date().getTime()}.pdf`;
-        pdf.save(filename);
+        pdf.save(`program_${parseInt(programIndex) + 1}.pdf`);
 
-        // Cleanup
         document.body.removeChild(tempContainer);
-        
-        // Success feedback
-        if (navigator.vibrate) {
-            navigator.vibrate([50, 50, 50]);
-        }
         
     } catch (error) {
         console.error("PDF indirme hatası:", error);
-        
-        // Mobile-friendly error message
-        if (window.innerWidth < 768) {
-            const errorDiv = document.createElement('div');
-            errorDiv.className = 'error';
-            errorDiv.textContent = '❌ PDF indirilirken hata oluştu. Tekrar deneyin.';
-            errorDiv.style.position = 'fixed';
-            errorDiv.style.top = '20px';
-            errorDiv.style.left = '20px';
-            errorDiv.style.right = '20px';
-            errorDiv.style.zIndex = '9999';
-            document.body.appendChild(errorDiv);
-            
-            setTimeout(() => errorDiv.remove(), 4000);
-        } else {
-            alert("PDF indirilirken bir hata oluştu. Lütfen tekrar deneyin.");
-        }
-        
-        // Error haptic feedback
-        if (navigator.vibrate) {
-            navigator.vibrate([100, 50, 100]);
-        }
+        alert("PDF indirilirken bir hata oluştu. Lütfen tekrar deneyin.");
     } finally {
-        // Reset button state
-        downloadButton.innerHTML = originalButtonText;
+        // İşlem bittiğinde butonu eski haline getir
+        downloadButton.textContent = originalButtonText;
         downloadButton.disabled = false;
         downloadButton.style.opacity = '1';
-        
-        // Hide loading overlay
-        if (window.mobileUtils) {
-            window.mobileUtils.hideLoadingOverlay();
-        }
     }
 }
 
-// Export for global access
+
+// Şube seçimi inputlarını ekleme/kaldırma ve güncelleme fonksiyonları
+function addPreferredSectionInput(courseCode) {
+    const preferredSectionsContainer = document.getElementById('preferred-sections-inputs');
+    const normalizedCode = courseCode.toUpperCase().replace(/\s/g, '');
+    if (preferredSectionsContainer.querySelector(`.preferred-section-input[data-course-code="${normalizedCode}"]`)) {
+        return;
+    }
+
+    const newPreferredSectionDiv = document.createElement('div');
+    newPreferredSectionDiv.className = 'course-input preferred-section-input';
+    newPreferredSectionDiv.dataset.courseCode = normalizedCode;
+
+    newPreferredSectionDiv.innerHTML = `
+        <span class="course-code-display" style="font-weight: 600; min-width: 100px;">${courseCode}</span>
+        <input type="text" class="section-selection" placeholder="Şubeleri virgülle ayır (örn: 1,3)" />
+    `;
+    preferredSectionsContainer.appendChild(newPreferredSectionDiv);
+}
+
+function updatePreferredSectionInput(originalCourseCode, newCourseCode) {
+    const preferredSectionsContainer = document.getElementById('preferred-sections-inputs');
+    const normalizedOriginalCode = originalCourseCode.toUpperCase().replace(/\s/g, '');
+    const normalizedNewCode = newCourseCode.toUpperCase().replace(/\s/g, '');
+    const existingDiv = preferredSectionsContainer.querySelector(`.preferred-section-input[data-course-code="${normalizedOriginalCode}"]`);
+
+    if (existingDiv) {
+        if (newCourseCode.trim() === '') {
+            existingDiv.remove();
+        } else {
+            existingDiv.dataset.courseCode = normalizedNewCode;
+            existingDiv.querySelector('.course-code-display').textContent = newCourseCode.toUpperCase();
+        }
+    } else if (newCourseCode.trim() !== '') {
+        addPreferredSectionInput(newCourseCode);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const courseInputsContainer = document.getElementById('course-inputs');
+    const preferredSectionsContainer = document.getElementById('preferred-sections-inputs');
+
+    courseInputsContainer.querySelectorAll('input[type="text"]').forEach(input => {
+        if (input.value.trim() !== '') {
+            addPreferredSectionInput(input.value.trim());
+            input.dataset.originalCourseCode = input.value.trim();
+        }
+        input.addEventListener('input', function() {
+            const originalCode = this.dataset.originalCourseCode || '';
+            const newCode = this.value.trim();
+            updatePreferredSectionInput(originalCode, newCode);
+            this.dataset.originalCourseCode = newCode;
+        });
+    });
+
+    window.addCourse = function() {
+        const newInputDiv = document.createElement('div');
+        newInputDiv.className = 'course-input';
+        newInputDiv.innerHTML = `
+            <input type="text" placeholder="Ders kodu (örn: SE 1108)" />
+            <button class="btn btn-danger btn-small" onclick="removeCourse(this)">Sil</button>
+        `;
+        courseInputsContainer.appendChild(newInputDiv);
+
+        const newCourseInput = newInputDiv.querySelector('input[type="text"]');
+        newCourseInput.addEventListener('input', function() {
+            const originalCode = this.dataset.originalCourseCode || '';
+            const newCode = this.value.trim();
+            updatePreferredSectionInput(originalCode, newCode);
+            this.dataset.originalCourseCode = newCode;
+        });
+        newCourseInput.focus();
+    };
+
+    window.removeCourse = function(button) {
+        const courseInputDiv = button.closest('.course-input');
+        const courseCodeInput = courseInputDiv.querySelector('input[type="text"]');
+        if (courseCodeInput && courseCodeInput.value.trim()) {
+            const courseCode = courseCodeInput.value.trim().toUpperCase();
+            const preferredSectionDiv = preferredSectionsContainer.querySelector(`.preferred-section-input[data-course-code="${courseCode.replace(/\s/g, '')}"]`);
+            if (preferredSectionDiv) {
+                preferredSectionDiv.remove();
+            }
+        }
+        courseInputDiv.remove();
+    };
+});
+
 window.generateSchedule = generateSchedule;
