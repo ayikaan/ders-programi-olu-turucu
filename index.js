@@ -63,6 +63,24 @@ function setupCourseContainer(courseContainerId, preferredContainerId) {
         setupCourseInput(input, preferredContainer);
     });
     
+    // Observe additions to courseContainer
+    const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            if (mutation.type === 'childList') {
+                mutation.addedNodes.forEach((node) => {
+                    if (node.nodeType === 1 && node.classList.contains('course-input')) {
+                        const newInput = node.querySelector('input[type="text"]');
+                        if (newInput) {
+                            setupCourseInput(newInput, preferredContainer);
+                        }
+                    }
+                });
+            }
+        });
+    });
+
+    observer.observe(courseContainer, { childList: true, subtree: true });
+
     // Handle removal
     courseContainer.addEventListener('click', function(event) {
         if (event.target.classList.contains('btn-danger')) {
@@ -83,6 +101,7 @@ function setupCourseContainer(courseContainerId, preferredContainerId) {
 }
 
 function setupCourseInput(input, preferredContainer) {
+    // Initial add for existing values
     if (input.value.trim()) {
         addPreferredSectionInput(input.value.trim(), preferredContainer);
         input.dataset.originalCourseCode = input.value.trim();
@@ -137,42 +156,75 @@ function updatePreferredSectionInput(originalCode, newCode, container) {
 
 function addCourse() {
     const container = document.getElementById('course-inputs');
-    const preferredContainer = document.getElementById('preferred-sections-inputs');
-    addCourseInput(container, preferredContainer, 'SE 1108');
-}
-
-function addCoursePerson1() {
-    const container = document.getElementById('person1-courses');
-    const preferredContainer = document.getElementById('person1-preferred-sections-inputs');
-    addCourseInput(container, preferredContainer, 'SE 1108');
-}
-
-function addCoursePerson2() {
-    const container = document.getElementById('person2-courses');
-    const preferredContainer = document.getElementById('person2-preferred-sections-inputs');
-    addCourseInput(container, preferredContainer, 'MATH 1132');
-}
-
-function addCourseInput(container, preferredContainer, placeholder) {
     const div = document.createElement('div');
     div.className = 'course-input';
     div.innerHTML = `
-        <input type="text" placeholder="Ders kodu (örn: ${placeholder})" autocomplete="off" />
+        <input type="text" placeholder="Ders kodu (örn: SE 1108)" autocomplete="off" />
         <button class="btn btn-danger btn-small" onclick="removeCourse(this)" type="button">Sil</button>
     `;
     container.appendChild(div);
     
     const input = div.querySelector('input');
-    setupCourseInput(input, preferredContainer);
+    input.focus();
+    
+    if (navigator.vibrate) navigator.vibrate(10);
+}
+
+function addCoursePerson1() {
+    const container = document.getElementById('person1-courses');
+    const div = document.createElement('div');
+    div.className = 'course-input';
+    div.innerHTML = `
+        <input type="text" placeholder="Ders kodu (örn: SE 1108)" autocomplete="off" />
+        <button class="btn btn-danger btn-small" onclick="removeCourse(this)" type="button">Sil</button>
+    `;
+    container.appendChild(div);
+    
+    const input = div.querySelector('input');
+    input.focus();
+    
+    if (navigator.vibrate) navigator.vibrate(10);
+}
+
+function addCoursePerson2() {
+    const container = document.getElementById('person2-courses');
+    const div = document.createElement('div');
+    div.className = 'course-input';
+    div.innerHTML = `
+        <input type="text" placeholder="Ders kodu (örn: MATH 1132)" autocomplete="off" />
+        <button class="btn btn-danger btn-small" onclick="removeCourse(this)" type="button">Sil</button>
+    `;
+    container.appendChild(div);
+    
+    const input = div.querySelector('input');
     input.focus();
     
     if (navigator.vibrate) navigator.vibrate(10);
 }
 
 function removeCourse(button) {
-    button.parentElement.remove();
+    const courseInputDiv = button.parentElement;
+    const courseCodeInput = courseInputDiv.querySelector('input[type="text"]');
+    
+    if (courseCodeInput && courseCodeInput.value.trim()) {
+        const courseCode = courseCodeInput.value.trim().toUpperCase().replace(/\s/g, '');
+        const preferredSectionsContainerId = courseInputDiv.closest('#single-tab') ? 'preferred-sections-inputs' : 
+                                             courseInputDiv.closest('#joint-tab') && courseInputDiv.closest('#person1-courses') ? 'person1-preferred-sections-inputs' : 
+                                             courseInputDiv.closest('#joint-tab') && courseInputDiv.closest('#person2-courses') ? 'person2-preferred-sections-inputs' : null;
+        
+        if (preferredSectionsContainerId) {
+            const preferredContainer = document.getElementById(preferredSectionsContainerId);
+            const preferredDiv = preferredContainer.querySelector(`.preferred-section-input[data-course-code="${courseCode}"]`);
+            if (preferredDiv) {
+                preferredDiv.remove();
+            }
+        }
+    }
+    
+    courseInputDiv.remove();
     if (navigator.vibrate) navigator.vibrate(15);
 }
+
 
 function debounce(func, wait) {
     let timeout;

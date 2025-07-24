@@ -124,22 +124,13 @@ async function generateSchedule() {
             .filter(code => code);
 
         const preferredSections = {};
-        const allCourseInputDivs = document.querySelectorAll('#course-inputs .course-input');
-        
-        allCourseInputDivs.forEach(div => {
-            const courseCodeInput = div.querySelector('input[type="text"]');
-            if (courseCodeInput && courseCodeInput.value.trim()) {
-                const courseCode = courseCodeInput.value.trim().toUpperCase();
-                const preferredSectionInputDiv = document.querySelector(`.preferred-section-input[data-course-code="${courseCode.replace(/\s/g, '')}"]`);
-                
-                if (preferredSectionInputDiv) {
-                    const sectionInput = preferredSectionInputDiv.querySelector('.section-selection');
-                    if (sectionInput && sectionInput.value.trim()) {
-                        const sections = sectionInput.value.split(',').map(s => s.trim()).filter(s => s);
-                        if (sections.length > 0) {
-                            preferredSections[courseCode] = sections;
-                        }
-                    }
+        document.querySelectorAll('#preferred-sections-inputs .preferred-section-input').forEach(div => {
+            const courseCodeDisplay = div.querySelector('.course-code-display').textContent;
+            const sectionInput = div.querySelector('.section-selection');
+            if (courseCodeDisplay && sectionInput && sectionInput.value.trim()) {
+                const sections = sectionInput.value.split(',').map(s => s.trim()).filter(s => s);
+                if (sections.length > 0) {
+                    preferredSections[courseCodeDisplay] = sections;
                 }
             }
         });
@@ -487,128 +478,27 @@ async function downloadProgramAsPdf(programIndex, downloadButton) {
     }
 }
 
-// Mobile-optimized course management functions
+// Mobile-optimized course management functions (these are now managed by index.js for better centralization)
+// These functions are kept for compatibility if called directly, but primary logic moved to index.js
 function addPreferredSectionInput(courseCode) {
     const preferredSectionsContainer = document.getElementById('preferred-sections-inputs');
-    const normalizedCode = courseCode.toUpperCase().replace(/\s/g, '');
-    
-    if (preferredSectionsContainer.querySelector(`.preferred-section-input[data-course-code="${normalizedCode}"]`)) {
-        return;
-    }
-
-    const newPreferredSectionDiv = document.createElement('div');
-    newPreferredSectionDiv.className = 'course-input preferred-section-input';
-    newPreferredSectionDiv.dataset.courseCode = normalizedCode;
-
-    newPreferredSectionDiv.innerHTML = `
-        <span class="course-code-display">${courseCode}</span>
-        <input type="text" class="section-selection" placeholder="Şubeleri virgülle ayır (örn: 1,3)" autocomplete="off" />
-    `;
-    preferredSectionsContainer.appendChild(newPreferredSectionDiv);
+    window.addPreferredSectionInput(courseCode, preferredSectionsContainer); // Delegate to global function
 }
 
 function updatePreferredSectionInput(originalCourseCode, newCourseCode) {
     const preferredSectionsContainer = document.getElementById('preferred-sections-inputs');
-    const normalizedOriginalCode = originalCourseCode.toUpperCase().replace(/\s/g, '');
-    const normalizedNewCode = newCourseCode.toUpperCase().replace(/\s/g, '');
-    const existingDiv = preferredSectionsContainer.querySelector(`.preferred-section-input[data-course-code="${normalizedOriginalCode}"]`);
-
-    if (existingDiv) {
-        if (newCourseCode.trim() === '') {
-            existingDiv.remove();
-        } else {
-            existingDiv.dataset.courseCode = normalizedNewCode;
-            existingDiv.querySelector('.course-code-display').textContent = newCourseCode.toUpperCase();
-        }
-    } else if (newCourseCode.trim() !== '') {
-        addPreferredSectionInput(newCourseCode);
-    }
+    window.updatePreferredSectionInput(originalCourseCode, newCourseCode, preferredSectionsContainer); // Delegate to global function
 }
 
-// Enhanced DOM ready handler for mobile
+// Enhanced DOM ready handler for mobile (most of this logic moved to index.js)
 document.addEventListener('DOMContentLoaded', () => {
-    const courseInputsContainer = document.getElementById('course-inputs');
-    const preferredSectionsContainer = document.getElementById('preferred-sections-inputs');
-
-    // Initialize existing inputs
-    courseInputsContainer.querySelectorAll('input[type="text"]').forEach(input => {
-        if (input.value.trim() !== '') {
-            addPreferredSectionInput(input.value.trim());
-            input.dataset.originalCourseCode = input.value.trim();
-        }
-        
-        // Mobile-optimized input handling
-        input.addEventListener('input', debounce(function() {
-            const originalCode = this.dataset.originalCourseCode || '';
-            const newCode = this.value.trim();
-            updatePreferredSectionInput(originalCode, newCode);
-            this.dataset.originalCourseCode = newCode;
-        }, 300));
-        
-        // Mobile keyboard handling
-        input.addEventListener('focus', function() {
-            setTimeout(() => {
-                this.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }, 300);
-        });
-    });
-
-    // Enhanced mobile functions
-    window.addCourse = function() {
-        const newInputDiv = document.createElement('div');
-        newInputDiv.className = 'course-input';
-        newInputDiv.innerHTML = `
-            <input type="text" placeholder="Ders kodu (örn: SE 1108)" autocomplete="off" />
-            <button class="btn btn-danger btn-small" onclick="removeCourse(this)" type="button">Sil</button>
-        `;
-        courseInputsContainer.appendChild(newInputDiv);
-
-        const newCourseInput = newInputDiv.querySelector('input[type="text"]');
-        
-        // Add mobile event listeners
-        newCourseInput.addEventListener('input', debounce(function() {
-            const originalCode = this.dataset.originalCourseCode || '';
-            const newCode = this.value.trim();
-            updatePreferredSectionInput(originalCode, newCode);
-            this.dataset.originalCourseCode = newCode;
-        }, 300));
-        
-        newCourseInput.addEventListener('focus', function() {
-            setTimeout(() => {
-                this.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }, 300);
-        });
-        
-        newCourseInput.focus();
-        
-        // Haptic feedback
-        if (navigator.vibrate) {
-            navigator.vibrate(10);
-        }
-    };
-
-    window.removeCourse = function(button) {
-        const courseInputDiv = button.closest('.course-input');
-        const courseCodeInput = courseInputDiv.querySelector('input[type="text"]');
-        
-        if (courseCodeInput && courseCodeInput.value.trim()) {
-            const courseCode = courseCodeInput.value.trim().toUpperCase();
-            const preferredSectionDiv = preferredSectionsContainer.querySelector(`.preferred-section-input[data-course-code="${courseCode.replace(/\s/g, '')}"]`);
-            if (preferredSectionDiv) {
-                preferredSectionDiv.remove();
-            }
-        }
-        
-        courseInputDiv.remove();
-        
-        // Haptic feedback
-        if (navigator.vibrate) {
-            navigator.vibrate(15);
-        }
-    };
+    // These functions are primarily defined and called in index.js now.
+    // Keeping this block minimal to avoid re-initializing if index.js already handled it.
+    // If a specific setup is needed ONLY for tekil_script, it can be added here.
 });
 
-// Debounce utility for mobile performance
+// Debounce utility (defined globally in index.js for consistency)
+// Keeping it here for local scope if needed, but not strictly necessary if global debounce is used.
 function debounce(func, wait) {
     let timeout;
     return function executedFunction(...args) {
