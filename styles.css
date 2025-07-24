@@ -1093,7 +1093,7 @@ input#joint-pdf-file::-webkit-file-upload-button {
 .form-group:has(input#joint-pdf-file)::before {
     content: "PDF dosyasını seçin"; /* The desired text */
     display: block;
-    padding: 0.75rem 0; /* Adjust padding to match button height */
+    padding: 0.75rem 1; /* Adjust padding to match button height */
     color: var(--text-secondary); /* Text color */
     font-size: 0.875rem; /* Font size */
     flex-grow: 1;
