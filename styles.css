@@ -597,6 +597,38 @@ input#joint-pdf-file {
     text-align: left; /* Align text to the left (even if hidden) */
     flex-shrink: 0; /* Prevent button and text from shrinking */
     width: auto; /* Allow width to grow based on content */
+    
+}input#pdf-file::-webkit-file-upload-button,
+input#joint-pdf-file::-webkit-file-upload-button {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color: white;
+    border: none;
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 0.875rem;
+    line-height: normal;
+    transition: all 0.3s ease;
+    font-family: inherit;
+    order: 1;
+    align-self: center;
+    display: block;
+    width: auto;
+    min-width: 120px;
+    margin: 0;
+    
+    /* ---- EKLENEN SATIRLAR ---- */
+    position: relative; /* Butona kendi pozisyon bağlamını verir */
+    z-index: 2;         /* Butonu, ana input'un arka planının üzerine çıkarır */
+    /* ---- EKLENEN SATIRLARIN SONU ---- */
+}
+
+
+/* Bu kural olduğu gibi kalmalı, sadece referans için burada */
+input[type="file"]:hover {
+    border-color: var(--primary);
+    background: var(--bg-secondary);
 }
 
 /* Rule block starting at line 586 – düzeltilmiş yorum satırı ile */
