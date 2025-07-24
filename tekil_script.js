@@ -1,4 +1,4 @@
-// tekil_script.js - Mobile Optimized
+// tekil_script.js - Mobile Optimized - FIXED
 
 // Ders nesnelerini PDF verilerinden oluşturma
 function buildCourses(courseCodes, pdfDataArray, preferredSections = {}) {
@@ -478,38 +478,8 @@ async function downloadProgramAsPdf(programIndex, downloadButton) {
     }
 }
 
-// Mobile-optimized course management functions (these are now managed by index.js for better centralization)
-// These functions are kept for compatibility if called directly, but primary logic moved to index.js
-function addPreferredSectionInput(courseCode) {
-    const preferredSectionsContainer = document.getElementById('preferred-sections-inputs');
-    window.addPreferredSectionInput(courseCode, preferredSectionsContainer); // Delegate to global function
-}
-
-function updatePreferredSectionInput(originalCourseCode, newCourseCode) {
-    const preferredSectionsContainer = document.getElementById('preferred-sections-inputs');
-    window.updatePreferredSectionInput(originalCourseCode, newCourseCode, preferredSectionsContainer); // Delegate to global function
-}
-
-// Enhanced DOM ready handler for mobile (most of this logic moved to index.js)
-document.addEventListener('DOMContentLoaded', () => {
-    // These functions are primarily defined and called in index.js now.
-    // Keeping this block minimal to avoid re-initializing if index.js already handled it.
-    // If a specific setup is needed ONLY for tekil_script, it can be added here.
-});
-
-// Debounce utility (defined globally in index.js for consistency)
-// Keeping it here for local scope if needed, but not strictly necessary if global debounce is used.
-function debounce(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
-        const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-        };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-    };
-}
+// REMOVED: Problematic addPreferredSectionInput functions that caused stack overflow
+// These functions are now handled centrally in index.js
 
 // Export for global access
 window.generateSchedule = generateSchedule;
